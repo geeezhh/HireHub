@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HireHub | Find Your Dream Job</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:    #0F0E2A;
+      --paper:  #F7F5F0;
+      --card:   #FFFFFF;
+      --coral:  #E8533A;
+      --indigo: #4A3FDB;
+      --muted:  #6B7280;
+      --border: #E5E2D8;
+      --radius: 16px;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: var(--paper); color: var(--ink); font-family: var(--font-body); line-height: 1.6; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 60px;
+      background: rgba(247,245,240,0.88); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: var(--font-head); font-size: 1.5rem; font-weight: 800; color: var(--ink); text-decoration: none; }
+    .nav-logo span { color: var(--coral); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: 0.92rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-cta { display: flex; gap: 12px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 100px; font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; border: none; transition: all .2s; }
+    .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--ink); }
+    .btn-ghost:hover { border-color: var(--ink); }
+    .btn-primary { background: var(--ink); color: #fff; }
+    .btn-primary:hover { background: var(--indigo); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74,63,219,.3); }
+    .btn-coral { background: var(--coral); color: #fff; }
+    .btn-coral:hover { background: #d44530; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,83,58,.35); }
+    .btn-lg { padding: 14px 32px; font-size: 1rem; border-radius: 100px; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      padding: 120px 60px 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 70% 60% at 80% 30%, rgba(74,63,219,.08) 0%, transparent 70%),
+                  radial-gradient(ellipse 50% 50% at 10% 80%, rgba(232,83,58,.06) 0%, transparent 60%);
+    }
+    .hero-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+      max-width: 1200px; margin: 0 auto; width: 100%;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #fff; border: 1px solid var(--border); border-radius: 100px;
+      padding: 6px 16px; font-size: 0.82rem; font-weight: 500; color: var(--muted);
+      margin-bottom: 28px; width: fit-content;
+      animation: fadeUp .6s ease both;
+    }
+    .hero-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--coral); }
+    .hero h1 {
+      font-family: var(--font-head); font-size: clamp(2.6rem, 4vw, 3.8rem); font-weight: 800;
+      line-height: 1.08; letter-spacing: -0.03em; color: var(--ink);
+      animation: fadeUp .6s .1s ease both;
+    }
+    .hero h1 em { font-style: normal; color: var(--coral); }
+    .hero-sub {
+      margin-top: 20px; font-size: 1.08rem; color: var(--muted); max-width: 440px;
+      animation: fadeUp .6s .2s ease both;
+    }
+    .hero-actions { margin-top: 36px; display: flex; gap: 14px; flex-wrap: wrap; animation: fadeUp .6s .3s ease both; }
+
+    .hero-search {
+      margin-top: 36px; display: flex; gap: 0; background: #fff;
+      border: 1.5px solid var(--border); border-radius: 100px; overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,.06);
+      animation: fadeUp .6s .35s ease both;
+    }
+    .hero-search input {
+      flex: 1; border: none; outline: none; padding: 14px 24px;
+      font-family: var(--font-body); font-size: 0.95rem; background: transparent; color: var(--ink);
+    }
+    .hero-search input::placeholder { color: #aaa; }
+    .hero-search select {
+      border: none; border-left: 1.5px solid var(--border); outline: none;
+      padding: 0 20px; background: transparent; font-family: var(--font-body); font-size: 0.9rem; color: var(--muted); cursor: pointer;
+    }
+    .hero-search button {
+      background: var(--ink); color: #fff; border: none; padding: 0 28px;
+      font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; cursor: pointer;
+      border-radius: 0 100px 100px 0; transition: background .2s;
+    }
+    .hero-search button:hover { background: var(--indigo); }
+
+    /* Hero visual */
+    .hero-visual { position: relative; animation: fadeUp .7s .2s ease both; }
+    .hero-card-stack { position: relative; height: 420px; }
+    .job-card-float {
+      position: absolute; background: #fff; border-radius: 18px;
+      padding: 20px 24px; box-shadow: 0 8px 40px rgba(0,0,0,.10);
+      border: 1px solid var(--border);
+    }
+    .job-card-float:nth-child(1) { width: 300px; top: 0; right: 40px; animation: floatA 4s ease-in-out infinite; }
+    .job-card-float:nth-child(2) { width: 280px; top: 130px; right: 0px; animation: floatB 5s ease-in-out infinite; }
+    .job-card-float:nth-child(3) { width: 260px; top: 260px; right: 60px; animation: floatA 4.5s .5s ease-in-out infinite; }
+    .jcf-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .jcf-logo {
+      width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; font-weight: 700; font-family: var(--font-head); color: #fff;
+    }
+    .jcf-title { font-family: var(--font-head); font-weight: 700; font-size: 0.95rem; }
+    .jcf-comp { font-size: 0.8rem; color: var(--muted); }
+    .jcf-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { background: var(--paper); border: 1px solid var(--border); border-radius: 100px; padding: 3px 10px; font-size: 0.75rem; color: var(--muted); }
+    .tag.green { background: #ECFDF5; border-color: #A7F3D0; color: #059669; }
+
+    /* ── STATS ── */
+    .stats { background: var(--ink); color: #fff; padding: 36px 60px; }
+    .stats-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 60px; justify-content: center; align-items: center; flex-wrap: wrap; }
+    .stat-item { text-align: center; }
+    .stat-num { font-family: var(--font-head); font-size: 2.4rem; font-weight: 800; color: var(--coral); }
+    .stat-label { font-size: 0.85rem; color: rgba(255,255,255,.55); margin-top: 2px; }
+
+    /* ── FEATURES ── */
+    .section { padding: 100px 60px; }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+    .section-label { display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--coral); margin-bottom: 16px; }
+    .section-title { font-family: var(--font-head); font-size: clamp(2rem, 3vw, 2.8rem); font-weight: 800; letter-spacing: -0.025em; color: var(--ink); max-width: 560px; line-height: 1.1; }
+    .features-grid { margin-top: 60px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 36px; transition: transform .3s, box-shadow .3s;
+      position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; inset: 0; opacity: 0;
+      background: linear-gradient(135deg, rgba(74,63,219,.04), transparent);
+      transition: opacity .3s;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,.08); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 20px;
+    }
+    .feature-card h3 { font-family: var(--font-head); font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+    .feature-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── HOW IT WORKS ── */
+    .hiw { background: var(--ink); color: #fff; padding: 100px 60px; }
+    .hiw .section-title { color: #fff; }
+    .hiw .section-label { color: var(--coral); }
+    .hiw-grid { margin-top: 60px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; }
+    .hiw-col h4 { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; color: var(--coral); margin-bottom: 28px; }
+    .step { display: flex; gap: 18px; margin-bottom: 28px; }
+    .step-num {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head); font-size: 0.85rem; font-weight: 700; color: #fff;
+    }
+    .step-body h5 { font-family: var(--font-head); font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+    .step-body p { font-size: 0.85rem; color: rgba(255,255,255,.5); line-height: 1.6; }
+
+    /* ── CTA ── */
+    .cta-section { padding: 100px 60px; text-align: center; background: var(--paper); }
+    .cta-inner { max-width: 640px; margin: 0 auto; }
+    .cta-inner h2 { font-family: var(--font-head); font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800; letter-spacing: -0.025em; color: var(--ink); margin-bottom: 16px; }
+    .cta-inner p { color: var(--muted); font-size: 1.05rem; margin-bottom: 36px; }
+    .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── FOOTER ── */
+    footer { background: var(--ink); color: rgba(255,255,255,.45); padding: 48px 60px 32px; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-start; gap: 48px; flex-wrap: wrap; }
+    .footer-brand .nav-logo { font-size: 1.4rem; color: #fff; }
+    .footer-brand p { font-size: 0.82rem; margin-top: 8px; color: rgba(255,255,255,.35); max-width: 240px; }
+    .footer-col h5 { font-family: var(--font-head); font-size: 0.82rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.6); margin-bottom: 14px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col a { text-decoration: none; color: rgba(255,255,255,.35); font-size: 0.85rem; transition: color .2s; }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom { max-width: 1200px; margin: 36px auto 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; font-size: 0.8rem; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+    @keyframes floatA { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    @keyframes floatB { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .hero { padding: 100px 24px 60px; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .stats { padding: 32px 24px; }
+      .stats-inner { gap: 32px; }
+      .section { padding: 60px 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .hiw { padding: 60px 24px; }
+      .hiw-grid { grid-template-columns: 1fr; }
+      .cta-section { padding: 60px 24px; }
+      footer { padding: 40px 24px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">Hire<span>Hub</span></a>
+  <ul class="nav-links">
+    <li><a href="/jobs">Browse Jobs</a></li>
+    <li><a href="/companies">Companies</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="/login" class="btn btn-ghost">Sign In</a>
+    <a href="/register" class="btn btn-primary">Get Started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid">
+    <div>
+      <div class="hero-badge"><div class="hero-badge-dot"></div> 2,400+ Jobs Posted This Month</div>
+      <h1>Find the Career<br>You <em>Deserve.</em></h1>
+      <p class="hero-sub">HireHub connects ambitious job seekers with top employers. Search, apply, and get hired — all in one place.</p>
+      <div class="hero-search">
+        <input type="text" placeholder="Job title, skill, or keyword…" />
+        <select>
+          <option>All Locations</option>
+          <option>Jaipur</option>
+          <option>Delhi</option>
+          <option>Bangalore</option>
+          <option>Mumbai</option>
+          <option>Remote</option>
+        </select>
+        <button>Search</button>
+      </div>
+      <div style="margin-top:18px; font-size:0.82rem; color:var(--muted); animation: fadeUp .6s .45s ease both;">
+        Popular: &nbsp;
+        <a href="/jobs?q=developer" style="color:var(--indigo);text-decoration:none;font-weight:500;">Developer</a> ·
+        <a href="/jobs?q=designer" style="color:var(--indigo);text-decoration:none;font-weight:500;">Designer</a> ·
+        <a href="/jobs?q=marketing" style="color:var(--indigo);text-decoration:none;font-weight:500;">Marketing</a> ·
+        <a href="/jobs?q=data" style="color:var(--indigo);text-decoration:none;font-weight:500;">Data Analyst</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-stack">
+        <div class="job-card-float">
+          <div class="jcf-top">
+            <div class="jcf-logo" style="background:#4A3FDB;">G</div>
+            <div><div class="jcf-title">Senior Frontend Dev</div><div class="jcf-comp">GrowthTech · Remote</div></div>
+          </div>
+          <div class="jcf-tags">
+            <span class="tag">React</span><span class="tag">TypeScript</span><span class="tag green">Hiring</span>
+          </div>
+          <div style="margin-top:12px; font-size:0.82rem; color:var(--muted);">₹18–28 LPA &nbsp;·&nbsp; Full-time</div>
+        </div>
+        <div class="job-card-float">
+          <div class="jcf-top">
+            <div class="jcf-logo" style="background:#E8533A;">N</div>
+            <div><div class="jcf-title">Product Manager</div><div class="jcf-comp">Nexus Corp · Bangalore</div></div>
+          </div>
+          <div class="jcf-tags">
+            <span class="tag">Product</span><span class="tag">Agile</span><span class="tag green">New</span>
+          </div>
+          <div style="margin-top:12px; font-size:0.82rem; color:var(--muted);">₹22–35 LPA &nbsp;·&nbsp; Full-time</div>
+        </div>
+        <div class="job-card-float">
+          <div class="jcf-top">
+            <div class="jcf-logo" style="background:#059669;">V</div>
+            <div><div class="jcf-title">UI/UX Designer</div><div class="jcf-comp">VisionWave · Jaipur</div></div>
+          </div>
+          <div class="jcf-tags">
+            <span class="tag">Figma</span><span class="tag">Design</span><span class="tag green">Urgent</span>
+          </div>
+          <div style="margin-top:12px; font-size:0.82rem; color:var(--muted);">₹8–14 LPA &nbsp;·&nbsp; Hybrid</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-num">12,400+</div><div class="stat-label">Active Job Listings</div></div>
+    <div class="stat-item"><div class="stat-num">3,800+</div><div class="stat-label">Registered Companies</div></div>
+    <div class="stat-item"><div class="stat-num">85,000+</div><div class="stat-label">Candidates Registered</div></div>
+    <div class="stat-item"><div class="stat-num">94%</div><div class="stat-label">Satisfaction Rate</div></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">✦ Why HireHub</div>
+    <div class="section-title">Everything you need to land your next role</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EEF2FF;">🔍</div>
+        <h3>Smart Job Search</h3>
+        <p>Filter by location, salary, role, and experience level. Find jobs that actually match your profile in seconds.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FEF2F2;">📄</div>
+        <h3>One-Click Apply</h3>
+        <p>Build your profile once, upload your resume, and apply to any listing instantly. No repeated form-filling.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#F0FDF4;">📊</div>
+        <h3>Application Tracker</h3>
+        <p>Track every application you've sent. See statuses — Applied, Shortlisted, or Rejected — in real time.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FFFBEB;">🏢</div>
+        <h3>Employer Dashboard</h3>
+        <p>Post jobs, review candidates, and manage your pipeline from a clean, unified recruiter dashboard.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#F5F3FF;">🔒</div>
+        <h3>Secure & Private</h3>
+        <p>Your data is protected with secure authentication. Resumes and contact info are only shared with employers you apply to.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FFF1F2;">📱</div>
+        <h3>Fully Responsive</h3>
+        <p>Works seamlessly on mobile, tablet, and desktop. Apply for jobs on the go, anytime, anywhere.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="hiw">
+  <div class="section-inner">
+    <div class="section-label">✦ How It Works</div>
+    <div class="section-title">Get hired in four simple steps</div>
+    <div class="hiw-grid">
+      <div class="hiw-col">
+        <h4>For Job Seekers</h4>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body"><h5>Create Your Profile</h5><p>Register as a Job Seeker, fill in your details, and upload your resume.</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body"><h5>Browse & Search Jobs</h5><p>Use filters to find roles that match your skills, location, and salary expectations.</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body"><h5>Apply Instantly</h5><p>Submit applications with one click. Your profile and resume are sent directly to the recruiter.</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body"><h5>Track Your Progress</h5><p>Monitor application statuses from your personal dashboard and land your dream job.</p></div>
+        </div>
+      </div>
+      <div class="hiw-col">
+        <h4>For Employers</h4>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body"><h5>Register Your Company</h5><p>Create a company profile with your logo, description, and contact information.</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body"><h5>Post a Job Opening</h5><p>Add detailed job descriptions, requirements, salary range, and work mode (remote/hybrid/on-site).</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body"><h5>Review Applicants</h5><p>Browse incoming applications, view resumes, and shortlist candidates from your dashboard.</p></div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body"><h5>Hire the Best Talent</h5><p>Contact shortlisted candidates directly and close positions fast.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <h2>Ready to take the next step?</h2>
+    <p>Join thousands of professionals and companies already on HireHub. It's free to get started.</p>
+    <div class="cta-btns">
+      <a href="/register?role=seeker" class="btn btn-primary btn-lg">Find Jobs →</a>
+      <a href="/register?role=employer" class="btn btn-coral btn-lg">Post a Job →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="nav-logo">Hire<span style="color:var(--coral)">Hub</span></a>
+      <p>Connecting talent with opportunity. Built for the modern workforce.</p>
+    </div>
+    <div class="footer-col">
+      <h5>For Seekers</h5>
+      <ul>
+        <li><a href="/jobs">Browse Jobs</a></li>
+        <li><a href="/register?role=seeker">Create Profile</a></li>
+        <li><a href="/dashboard/seeker">My Applications</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>For Employers</h5>
+      <ul>
+        <li><a href="/register?role=employer">Post a Job</a></li>
+        <li><a href="/dashboard/employer">Employer Dashboard</a></li>
+        <li><a href="/companies">Browse Companies</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <ul>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/privacy">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 HireHub · JECRC University Minor Project · Manya Ranjan &amp; Garv Jain</div>
+</footer>
+
+</body>
+</html>

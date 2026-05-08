@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    :root {
+      --ink: #0F0E2A; --paper: #F7F5F0; --card: #fff; --coral: #E8533A; --indigo: #4A3FDB;
+      --muted: #6B7280; --border: #E5E2D8; --sidebar-w: 240px;
+      --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--paper); color: var(--ink); display: flex; min-height: 100vh; }
+
+    /* SIDEBAR (same as employer) */
+    aside {
+      width: var(--sidebar-w); background: var(--ink); color: #fff;
+      display: flex; flex-direction: column; padding: 28px 20px;
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
+    }
+    .logo { font-family: var(--font-head); font-size: 1.4rem; font-weight: 800; color: #fff; text-decoration: none; padding-bottom: 28px; border-bottom: 1px solid rgba(255,255,255,.1); margin-bottom: 28px; display: block; }
+    .logo span { color: var(--coral); }
+    .company-chip { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.06); border-radius: 12px; padding: 12px; margin-bottom: 24px; }
+    .company-logo { width: 38px; height: 38px; border-radius: 10px; background: var(--coral); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-weight: 800; font-size: 0.9rem; color: #fff; flex-shrink: 0; }
+    .company-name { font-size: 0.85rem; font-weight: 600; }
+    .company-plan { font-size: 0.72rem; color: rgba(255,255,255,.4); }
+    .nav-group-label { font-size: 0.7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 10px; }
+    .sidebar-nav { list-style: none; display: flex; flex-direction: column; gap: 4px; margin-bottom: 28px; }
+    .sidebar-nav li a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; font-size: 0.88rem; font-weight: 500; color: rgba(255,255,255,.55); text-decoration: none; transition: all .2s; }
+    .sidebar-nav li a:hover, .sidebar-nav li a.active { background: rgba(255,255,255,.08); color: #fff; }
+    .sidebar-nav li a.active { background: rgba(74,63,219,.35); }
+    .sidebar-icon { font-size: 1.05rem; width: 20px; text-align: center; }
+    .sidebar-bottom { margin-top: auto; }
+    .sign-out { display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: rgba(255,255,255,.4); font-size: 0.82rem; text-decoration: none; border-radius: 10px; transition: .2s; }
+    .sign-out:hover { background: rgba(255,255,255,.06); }
+
+    /* MAIN */
+    main { margin-left: var(--sidebar-w); flex: 1; padding: 40px; max-width: calc(900px + var(--sidebar-w)); }
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { font-family: var(--font-head); font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; }
+    .page-header p { font-size: 0.9rem; color: var(--muted); }
+
+    .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 20px; }
+    .form-card-title { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .form-card-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .form-group { margin-bottom: 0; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { display: block; font-size: 0.82rem; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+    .label-hint { font-size: 0.75rem; color: var(--muted); font-weight: 400; margin-left: 6px; }
+    input[type="text"], input[type="number"], input[type="url"], select, textarea {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: var(--font-body); font-size: 0.92rem; color: var(--ink); background: #fff;
+      outline: none; transition: border-color .2s; resize: vertical;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--indigo); }
+    select { cursor: pointer; }
+    textarea { min-height: 120px; }
+
+    /* Salary range */
+    .salary-range { display: flex; align-items: center; gap: 10px; }
+    .salary-range input { flex: 1; }
+    .salary-range span { color: var(--muted); font-size: 0.9rem; flex-shrink: 0; }
+
+    /* Work mode radio */
+    .radio-group { display: flex; gap: 12px; flex-wrap: wrap; }
+    .radio-pill { display: flex; align-items: center; gap: 8px; }
+    .radio-pill input[type="radio"] { display: none; }
+    .radio-pill label {
+      padding: 9px 18px; border-radius: 100px; border: 1.5px solid var(--border);
+      font-size: 0.85rem; font-weight: 500; cursor: pointer; background: #fff;
+      transition: all .2s; color: var(--muted); margin-bottom: 0;
+    }
+    .radio-pill input[type="radio"]:checked + label { border-color: var(--indigo); background: #EEF2FF; color: var(--indigo); }
+
+    /* Skills tags input */
+    .tags-container {
+      display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 14px;
+      border: 1.5px solid var(--border); border-radius: 10px; background: #fff; min-height: 48px;
+      align-items: center; cursor: text;
+    }
+    .tags-container:focus-within { border-color: var(--indigo); }
+    .skill-tag {
+      display: flex; align-items: center; gap: 6px; background: #EEF2FF; color: var(--indigo);
+      border-radius: 100px; padding: 4px 12px; font-size: 0.8rem; font-weight: 500;
+    }
+    .skill-tag button { background: none; border: none; cursor: pointer; color: var(--indigo); font-size: 0.9rem; padding: 0; line-height: 1; }
+    #skillInput { border: none; outline: none; font-family: var(--font-body); font-size: 0.9rem; color: var(--ink); min-width: 120px; background: transparent; }
+
+    /* Form actions */
+    .form-actions { display: flex; gap: 12px; align-items: center; justify-content: flex-end; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px; border-radius: 100px; font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; border: none; transition: all .2s; }
+    .btn-primary { background: var(--ink); color: #fff; }
+    .btn-primary:hover { background: var(--indigo); transform: translateY(-1px); }
+    .btn-coral { background: var(--coral); color: #fff; }
+    .btn-coral:hover { background: #d44530; transform: translateY(-1px); }
+    .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--ink); }
+    .btn-ghost:hover { border-color: var(--ink); }
+
+    @media (max-width: 900px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+    }
+    @media (max-width: 768px) {
+      aside { display: none; }
+      main { margin-left: 0; padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<aside>
+  <a href="/" class="logo">Hire<span>Hub</span></a>
+  <div class="company-chip">
+    <div class="company-logo">A</div>
+    <div><div class="company-name">Acme Technologies</div><div class="company-plan">Employer Account</div></div>
+  </div>
+  <div class="nav-group-label">Recruiting</div>
+  <ul class="sidebar-nav">
+    <li><a href="/dashboard/employer"><span class="sidebar-icon">🏠</span> Dashboard</a></li>
+    <li><a href="/dashboard/employer/jobs"><span class="sidebar-icon">📋</span> My Job Posts</a></li>
+    <li><a href="/dashboard/employer/applicants"><span class="sidebar-icon">👥</span> All Applicants</a></li>
+    <li><a href="/dashboard/employer/shortlisted"><span class="sidebar-icon">⭐</span> Shortlisted</a></li>
+    <li><a href="/jobs/new" class="active"><span class="sidebar-icon">➕</span> Post a Job</a></li>
+  </ul>
+  <div class="nav-group-label">Account</div>
+  <ul class="sidebar-nav">
+    <li><a href="/dashboard/employer/profile"><span class="sidebar-icon">🏢</span> Company Profile</a></li>
+    <li><a href="/settings"><span class="sidebar-icon">⚙️</span> Settings</a></li>
+  </ul>
+  <div class="sidebar-bottom">
+    <a href="/logout" class="sign-out">🚪 Sign Out</a>
+  </div>
+</aside>
+
+<main>
+  <div class="page-header">
+    <h1>Post a New Job</h1>
+    <p>Fill in the details below. The more specific you are, the better candidates you'll attract.</p>
+  </div>
+
+  <form th:action="@{/jobs/new}" method="post">
+
+    <!-- BASIC INFO -->
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="form-card-icon" style="background:#EEF2FF;">📝</div>
+        Basic Information
+      </div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label for="jobTitle">Job Title <span class="label-hint">Be specific, e.g. "Senior Java Backend Developer"</span></label>
+          <input type="text" id="jobTitle" name="jobTitle" placeholder="e.g. Frontend Developer" required />
+        </div>
+        <div class="form-group">
+          <label for="department">Department</label>
+          <select id="department" name="department">
+            <option value="">Select department</option>
+            <option>Engineering</option>
+            <option>Design</option>
+            <option>Product</option>
+            <option>Marketing</option>
+            <option>Sales</option>
+            <option>Finance</option>
+            <option>HR</option>
+            <option>Operations</option>
+            <option>Data & Analytics</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="jobType">Employment Type</label>
+          <select id="jobType" name="jobType">
+            <option>Full-time</option>
+            <option>Part-time</option>
+            <option>Internship</option>
+            <option>Contract</option>
+            <option>Freelance</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="location">Job Location</label>
+          <input type="text" id="location" name="location" placeholder="e.g. Jaipur, Rajasthan" />
+        </div>
+        <div class="form-group">
+          <label>Work Mode</label>
+          <div class="radio-group">
+            <div class="radio-pill">
+              <input type="radio" name="workMode" id="onsite" value="onsite" checked />
+              <label for="onsite">On-site</label>
+            </div>
+            <div class="radio-pill">
+              <input type="radio" name="workMode" id="remote" value="remote" />
+              <label for="remote">Remote</label>
+            </div>
+            <div class="radio-pill">
+              <input type="radio" name="workMode" id="hybrid" value="hybrid" />
+              <label for="hybrid">Hybrid</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REQUIREMENTS -->
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="form-card-icon" style="background:#F0FDF4;">🎯</div>
+        Requirements
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="experience">Experience Required</label>
+          <select id="experience" name="experience">
+            <option value="0">Fresher / No experience required</option>
+            <option value="0-1">0–1 Year</option>
+            <option value="1-3">1–3 Years</option>
+            <option value="3-5">3–5 Years</option>
+            <option value="5+">5+ Years</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="education">Minimum Education</label>
+          <select id="education" name="education">
+            <option>Any</option>
+            <option>High School / 12th</option>
+            <option>Diploma</option>
+            <option>Bachelor's Degree</option>
+            <option>Master's Degree</option>
+            <option>Ph.D.</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Required Skills <span class="label-hint">Type and press Enter to add</span></label>
+          <div class="tags-container" id="tagsContainer" onclick="document.getElementById('skillInput').focus()">
+            <span class="skill-tag">Java <button type="button" onclick="removeTag(this)">×</button></span>
+            <span class="skill-tag">Spring Boot <button type="button" onclick="removeTag(this)">×</button></span>
+            <span class="skill-tag">MySQL <button type="button" onclick="removeTag(this)">×</button></span>
+            <input type="text" id="skillInput" placeholder="Add skill…" />
+          </div>
+          <input type="hidden" id="skillsHidden" name="skills" value="Java,Spring Boot,MySQL" />
+        </div>
+        <div class="form-group full">
+          <label for="jobDesc">Job Description <span class="label-hint">Responsibilities, what success looks like</span></label>
+          <textarea id="jobDesc" name="jobDescription" rows="6" placeholder="Describe the role, key responsibilities, team structure, and what the candidate will work on day-to-day…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPENSATION -->
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="form-card-icon" style="background:#FFFBEB;">💰</div>
+        Compensation & Perks
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Salary Range (LPA / Month)</label>
+          <div class="salary-range">
+            <input type="number" name="salaryMin" placeholder="Min" min="0" />
+            <span>to</span>
+            <input type="number" name="salaryMax" placeholder="Max" min="0" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="salaryType">Salary Type</label>
+          <select id="salaryType" name="salaryType">
+            <option>Per Annum (LPA)</option>
+            <option>Per Month</option>
+            <option>Per Hour</option>
+            <option>Negotiable</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label for="perks">Perks & Benefits <span class="label-hint">Optional</span></label>
+          <input type="text" id="perks" name="perks" placeholder="e.g. Health insurance, flexible hours, stock options, free meals…" />
+        </div>
+        <div class="form-group">
+          <label for="openings">Number of Openings</label>
+          <input type="number" id="openings" name="openings" placeholder="1" min="1" value="1" />
+        </div>
+        <div class="form-group">
+          <label for="deadline">Application Deadline</label>
+          <input type="text" id="deadline" name="deadline" placeholder="e.g. May 31, 2026" />
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM ACTIONS -->
+    <div class="form-actions">
+      <a href="/dashboard/employer" class="btn btn-ghost">Cancel</a>
+      <button type="submit" name="action" value="draft" class="btn btn-ghost">Save as Draft</button>
+      <button type="submit" name="action" value="publish" class="btn btn-coral">Publish Job →</button>
+    </div>
+
+  </form>
+</main>
+
+<script>
+  const input = document.getElementById('skillInput');
+  const container = document.getElementById('tagsContainer');
+  const hidden = document.getElementById('skillsHidden');
+
+  function getSkills() {
+    return Array.from(container.querySelectorAll('.skill-tag')).map(t => t.textContent.trim().replace('×','').trim());
+  }
+
+  function updateHidden() { hidden.value = getSkills().join(','); }
+
+  input.addEventListener('keydown', function(e) {
+    if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
+      e.preventDefault();
+      const tag = document.createElement('span');
+      tag.className = 'skill-tag';
+      tag.innerHTML = `${this.value.trim()} <button type="button" onclick="removeTag(this)">×</button>`;
+      container.insertBefore(tag, input);
+      this.value = '';
+      updateHidden();
+    }
+  });
+
+  function removeTag(btn) {
+    btn.parentElement.remove();
+    updateHidden();
+  }
+</script>
+</body>
+</html>

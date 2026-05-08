@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In | HireHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink:    #0F0E2A;
+      --paper:  #F7F5F0;
+      --coral:  #E8533A;
+      --indigo: #4A3FDB;
+      --muted:  #6B7280;
+      --border: #E5E2D8;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+    body {
+      font-family: var(--font-body); background: var(--paper); color: var(--ink);
+      min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr;
+    }
+
+    /* LEFT PANEL */
+    .panel-left {
+      background: var(--ink); color: #fff;
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 48px; position: relative; overflow: hidden;
+    }
+    .panel-left::before {
+      content: ''; position: absolute; top: -120px; right: -120px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,83,58,.25) 0%, transparent 70%);
+    }
+    .panel-left::after {
+      content: ''; position: absolute; bottom: -80px; left: -80px;
+      width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(74,63,219,.2) 0%, transparent 70%);
+    }
+    .logo { font-family: var(--font-head); font-size: 1.6rem; font-weight: 800; text-decoration: none; color: #fff; }
+    .logo span { color: var(--coral); }
+    .panel-left-body { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
+    .panel-left h2 { font-family: var(--font-head); font-size: 2.4rem; font-weight: 800; line-height: 1.12; letter-spacing: -0.025em; margin-bottom: 16px; }
+    .panel-left h2 em { font-style: normal; color: var(--coral); }
+    .panel-left p { font-size: 0.95rem; color: rgba(255,255,255,.55); max-width: 340px; line-height: 1.65; }
+    .panel-testimonial {
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 14px; padding: 22px; margin-top: 40px; position: relative; z-index: 1;
+    }
+    .panel-testimonial blockquote { font-size: 0.9rem; color: rgba(255,255,255,.75); line-height: 1.6; font-style: italic; }
+    .panel-testimonial cite { display: block; margin-top: 10px; font-size: 0.8rem; color: rgba(255,255,255,.4); font-style: normal; }
+
+    /* RIGHT PANEL */
+    .panel-right { display: flex; align-items: center; justify-content: center; padding: 48px; }
+    .auth-box { width: 100%; max-width: 400px; }
+    .auth-box h1 { font-family: var(--font-head); font-size: 1.9rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .auth-box .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 36px; }
+    .auth-box .subtitle a { color: var(--indigo); text-decoration: none; font-weight: 500; }
+
+    .role-tabs { display: flex; background: #EDEBE5; border-radius: 100px; padding: 4px; margin-bottom: 28px; }
+    .role-tab {
+      flex: 1; text-align: center; padding: 9px; border-radius: 100px; font-size: 0.88rem; font-weight: 500;
+      cursor: pointer; transition: all .2s; color: var(--muted); border: none; background: transparent;
+      font-family: var(--font-body);
+    }
+    .role-tab.active { background: #fff; color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 0.82rem; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+    input[type="email"], input[type="password"], input[type="text"] {
+      width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: var(--font-body); font-size: 0.92rem; color: var(--ink); background: #fff;
+      outline: none; transition: border-color .2s;
+    }
+    input:focus { border-color: var(--indigo); }
+    .form-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .remember { display: flex; align-items: center; gap: 8px; font-size: 0.83rem; color: var(--muted); cursor: pointer; }
+    .remember input { width: auto; }
+    .forgot { font-size: 0.83rem; color: var(--indigo); text-decoration: none; font-weight: 500; }
+
+    .btn-submit {
+      width: 100%; padding: 13px; background: var(--ink); color: #fff; border: none; border-radius: 10px;
+      font-family: var(--font-head); font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      transition: all .2s; letter-spacing: 0.01em;
+    }
+    .btn-submit:hover { background: var(--indigo); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74,63,219,.3); }
+
+    .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0; color: var(--border); font-size: 0.8rem; color: var(--muted); }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .register-link { text-align: center; margin-top: 24px; font-size: 0.88rem; color: var(--muted); }
+    .register-link a { color: var(--indigo); text-decoration: none; font-weight: 500; }
+
+    @media (max-width: 768px) {
+      body { grid-template-columns: 1fr; }
+      .panel-left { display: none; }
+      .panel-right { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="panel-left">
+  <a href="/" class="logo">Hire<span>Hub</span></a>
+  <div class="panel-left-body">
+    <h2>Welcome<br>back to<br><em>HireHub.</em></h2>
+    <p>Thousands of jobs are waiting. Sign in and take the next step in your career journey.</p>
+    <div class="panel-testimonial">
+      <blockquote>"HireHub helped me land my first developer role within 3 weeks of signing up. The platform is so easy to use!"</blockquote>
+      <cite>— Priya S., Software Engineer at TechNova</cite>
+    </div>
+  </div>
+  <div style="font-size:0.78rem; color:rgba(255,255,255,.25);">© 2026 HireHub</div>
+</div>
+
+<div class="panel-right">
+  <div class="auth-box">
+    <h1>Sign In</h1>
+    <p class="subtitle">Don't have an account? <a href="/register">Create one free →</a></p>
+
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="setRole(this,'seeker')">Job Seeker</button>
+      <button class="role-tab" onclick="setRole(this,'employer')">Employer</button>
+      <button class="role-tab" onclick="setRole(this,'admin')">Admin</button>
+    </div>
+
+    <form th:action="@{/login}" method="post">
+      <input type="hidden" name="role" id="roleField" value="seeker" />
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required />
+      </div>
+      <div class="form-row">
+        <label class="remember"><input type="checkbox" name="remember" /> Remember me</label>
+        <a href="/forgot-password" class="forgot">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn-submit">Sign In →</button>
+    </form>
+
+    <div class="register-link">
+      New to HireHub? <a href="/register">Create a free account</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setRole(el, role) {
+    document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('roleField').value = role;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employer Dashboard | HireHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#0F0E2A;--paper:#F7F5F0;--card:#fff;--coral:#E8533A;--indigo:#4A3FDB;--muted:#6B7280;--border:#E5E2D8;--sidebar-w:240px;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif}
+    body{font-family:var(--font-body);background:var(--paper);color:var(--ink);display:flex;min-height:100vh}
+    aside{width:var(--sidebar-w);background:var(--ink);color:#fff;display:flex;flex-direction:column;padding:28px 20px;position:fixed;top:0;left:0;bottom:0;z-index:50}
+    .logo{font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:#fff;text-decoration:none;padding-bottom:28px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:28px;display:block}
+    .logo span{color:var(--coral)}
+    .company-chip{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:12px;padding:12px;margin-bottom:24px}
+    .company-logo{width:38px;height:38px;border-radius:10px;background:var(--coral);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:.9rem;color:#fff;flex-shrink:0}
+    .company-name{font-size:.85rem;font-weight:600}
+    .company-plan{font-size:.72rem;color:rgba(255,255,255,.4)}
+    .nav-group-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px}
+    .sidebar-nav{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:28px}
+    .sidebar-nav li a{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;font-size:.88rem;font-weight:500;color:rgba(255,255,255,.55);text-decoration:none;transition:all .2s}
+    .sidebar-nav li a:hover,.sidebar-nav li a.active{background:rgba(255,255,255,.08);color:#fff}
+    .sidebar-nav li a.active{background:rgba(74,63,219,.35)}
+    .sidebar-icon{font-size:1.05rem;width:20px;text-align:center}
+    .sidebar-bottom{margin-top:auto}
+    .sign-out{display:flex;align-items:center;gap:10px;padding:10px 14px;color:rgba(255,255,255,.4);font-size:.82rem;text-decoration:none;border-radius:10px;transition:.2s}
+    .sign-out:hover{background:rgba(255,255,255,.06)}
+    main{margin-left:var(--sidebar-w);flex:1;padding:36px 40px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+    .topbar h1{font-family:var(--font-head);font-size:1.5rem;font-weight:800}
+    .topbar p{font-size:.88rem;color:var(--muted);margin-top:2px}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:100px;font-family:var(--font-body);font-size:.88rem;font-weight:500;cursor:pointer;text-decoration:none;border:none;transition:all .2s}
+    .btn-coral{background:var(--coral);color:#fff}
+    .btn-coral:hover{background:#d44530}
+    .btn-ghost-sm{padding:7px 14px;font-size:.8rem;border-radius:100px;border:1.5px solid var(--border);background:transparent;color:var(--ink);cursor:pointer;font-family:var(--font-body);font-weight:500;text-decoration:none;transition:.2s}
+    .btn-ghost-sm:hover{border-color:var(--ink)}
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px}
+    .stat-card.highlight{background:var(--ink);color:#fff}
+    .stat-label{font-size:.75rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+    .stat-card.highlight .stat-label{color:rgba(255,255,255,.4)}
+    .stat-val{font-family:var(--font-head);font-size:2rem;font-weight:800}
+    .stat-card.highlight .stat-val{color:var(--coral)}
+    .stat-sub{font-size:.76rem;color:var(--muted);margin-top:3px}
+    .stat-card.highlight .stat-sub{color:rgba(255,255,255,.3)}
+    .col-layout{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+    .section-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
+    .section-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .section-card-title{font-family:var(--font-head);font-size:.95rem;font-weight:700}
+    .see-all{font-size:.8rem;color:var(--indigo);text-decoration:none;font-weight:500}
+    .job-post-item{border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;display:flex;align-items:center;gap:16px;background:var(--paper);transition:box-shadow .2s}
+    .job-post-item:hover{box-shadow:0 4px 20px rgba(0,0,0,.06)}
+    .job-post-item:last-child{margin-bottom:0}
+    .jpi-icon{width:44px;height:44px;border-radius:12px;background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+    .jpi-body{flex:1}
+    .jpi-title{font-family:var(--font-head);font-weight:700;font-size:.9rem;margin-bottom:3px}
+    .jpi-meta{font-size:.78rem;color:var(--muted)}
+    .jpi-actions{display:flex;gap:8px;align-items:center}
+    .badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:100px;font-size:.75rem;font-weight:600}
+    .badge-active{background:#ECFDF5;color:#059669}
+    .badge-closed{background:#F3F4F6;color:#6B7280}
+    .badge-draft{background:#FFFBEB;color:#D97706}
+    .applicant-count{font-size:.78rem;color:var(--muted);white-space:nowrap}
+    .applicant-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+    .applicant-item:last-child{border-bottom:none}
+    .applicant-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:.82rem;color:#fff;flex-shrink:0;background:var(--indigo)}
+    .applicant-name{font-weight:600;font-size:.88rem}
+    .applicant-meta{font-size:.76rem;color:var(--muted)}
+    .applicant-actions{margin-left:auto;display:flex;gap:6px}
+    .btn-shortlist{padding:5px 12px;font-size:.75rem;border-radius:100px;background:#ECFDF5;color:#059669;border:1px solid #A7F3D0;cursor:pointer;font-family:var(--font-body);font-weight:600;text-decoration:none}
+    .btn-reject{padding:5px 12px;font-size:.75rem;border-radius:100px;background:#FEF2F2;color:#DC2626;border:1px solid #FCA5A5;cursor:pointer;font-family:var(--font-body);font-weight:600;text-decoration:none}
+    .empty-state{text-align:center;padding:32px 20px;color:var(--muted);font-size:.9rem}
+    .empty-state .ei{font-size:2rem;margin-bottom:10px}
+    @media(max-width:1100px){.stats-row{grid-template-columns:1fr 1fr}.col-layout{grid-template-columns:1fr}}
+    @media(max-width:768px){aside{display:none}main{margin-left:0;padding:24px 16px}.stats-row{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+
+<aside>
+  <a href="/" class="logo">Hire<span>Hub</span></a>
+
+  <!-- ✅ Real company name from DB -->
+  <div class="company-chip">
+    <div class="company-logo"
+      th:text="${#strings.substring(user.companyName!=null?user.companyName:user.firstName,0,1)}">?</div>
+    <div>
+      <div class="company-name" th:text="${user.companyName!=null?user.companyName:user.fullName}">Company</div>
+      <div class="company-plan">Employer Account</div>
+    </div>
+  </div>
+
+  <div class="nav-group-label">Recruiting</div>
+  <ul class="sidebar-nav">
+    <li><a href="/dashboard/employer" class="active"><span class="sidebar-icon">🏠</span> Dashboard</a></li>
+    <li><a href="/dashboard/employer/jobs"><span class="sidebar-icon">📋</span> My Job Posts</a></li>
+    <li><a href="/dashboard/employer/applicants"><span class="sidebar-icon">👥</span> All Applicants</a></li>
+    <li><a href="/dashboard/employer/shortlisted"><span class="sidebar-icon">⭐</span> Shortlisted</a></li>
+    <li><a href="/jobs/new"><span class="sidebar-icon">➕</span> Post a Job</a></li>
+  </ul>
+  <div class="nav-group-label">Account</div>
+  <ul class="sidebar-nav">
+    <li><a href="/dashboard/employer/profile"><span class="sidebar-icon">🏢</span> Company Profile</a></li>
+    <li><a href="/settings"><span class="sidebar-icon">⚙️</span> Settings</a></li>
+  </ul>
+  <div class="sidebar-bottom">
+    <a href="/logout" class="sign-out">🚪 Sign Out</a>
+  </div>
+</aside>
+
+<main>
+  <div class="topbar">
+    <div>
+      <h1>Employer Dashboard</h1>
+      <!-- ✅ Real employer name and company -->
+      <p>Welcome back, <span th:text="${user.firstName}">User</span>.
+         Here's what's happening at <span th:text="${user.companyName!=null?user.companyName:'your company'}">Company</span>.</p>
+    </div>
+    <a href="/jobs/new" class="btn btn-coral">+ Post a New Job</a>
+  </div>
+
+  <!-- ✅ Real stats from DB -->
+  <div class="stats-row">
+    <div class="stat-card highlight">
+      <div class="stat-label">Total Applicants</div>
+      <div class="stat-val" th:text="${recentApplicants.size()}">0</div>
+      <div class="stat-sub">Across all jobs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active Job Posts</div>
+      <div class="stat-val" style="color:var(--indigo)" th:text="${activeJobs}">0</div>
+      <div class="stat-sub">Currently live</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Shortlisted</div>
+      <div class="stat-val" style="color:#059669" th:text="${shortlisted}">0</div>
+      <div class="stat-sub">Awaiting your call</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Posts</div>
+      <div class="stat-val" style="color:var(--coral)" th:text="${myJobs.size()}">0</div>
+      <div class="stat-sub">All time</div>
+    </div>
+  </div>
+
+  <div class="col-layout">
+    <div>
+      <!-- ✅ Real job posts from DB -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-title">My Job Posts</div>
+          <a href="/jobs/new" class="see-all">+ Post new →</a>
+        </div>
+
+        <div class="empty-state" th:if="${myJobs.isEmpty()}">
+          <div class="ei">📋</div>
+          No jobs posted yet.<br/>
+          <a href="/jobs/new" style="color:var(--coral);font-weight:600;text-decoration:none;margin-top:8px;display:inline-block">Post your first job →</a>
+        </div>
+
+        <div th:each="job : ${myJobs}" class="job-post-item">
+          <div class="jpi-icon">💼</div>
+          <div class="jpi-body">
+            <div class="jpi-title" th:text="${job.jobTitle}">Job Title</div>
+            <div class="jpi-meta">
+              <span th:text="${job.jobType?:'Full-time'}"></span>
+              <span th:if="${job.location}"> · <span th:text="${job.location}"></span></span>
+              <span th:if="${job.salaryMin!=null}"> · ₹<span th:text="${job.salaryMin}"></span>–<span th:text="${job.salaryMax}"></span></span>
+              · Posted <span th:text="${#temporals.format(job.createdAt,'MMM dd')}"></span>
+            </div>
+          </div>
+          <!-- Badge based on real status -->
+          <span th:class="'badge badge-'+${#strings.toLowerCase(job.status)}"
+                th:text="${job.status}">ACTIVE</span>
+          <div class="jpi-actions">
+            <a th:href="@{'/dashboard/employer/jobs/'+${job.id}+'/applicants'}" class="btn-ghost-sm">View</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ Real applicants from DB -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-title">Recent Applicants</div>
+          <a href="/dashboard/employer/applicants" class="see-all">View all →</a>
+        </div>
+
+        <div class="empty-state" th:if="${recentApplicants.isEmpty()}">
+          <div class="ei">👥</div>
+          No applicants yet. Post a job to start receiving applications.
+        </div>
+
+        <div th:each="app,iter : ${recentApplicants}" th:if="${iter.index < 6}" class="applicant-item">
+          <!-- Initials avatar -->
+          <div class="applicant-avatar"
+            th:text="${#strings.substring(app.seeker.firstName,0,1)}+${#strings.substring(app.seeker.lastName,0,1)}">??</div>
+          <div>
+            <div class="applicant-name" th:text="${app.seeker.firstName+' '+app.seeker.lastName}">Name</div>
+            <div class="applicant-meta">
+              <span th:text="${app.jobPost.jobTitle}">Role</span> ·
+              Applied <span th:text="${#temporals.format(app.appliedAt,'MMM dd')}">Date</span>
+            </div>
+          </div>
+          <!-- ✅ Real shortlist/reject buttons that POST to backend -->
+          <div class="applicant-actions">
+            <form th:action="@{'/applications/'+${app.id}+'/status'}" method="post" style="display:inline">
+              <input type="hidden" name="status" value="SHORTLISTED"/>
+              <button type="submit" class="btn-shortlist">✓ Shortlist</button>
+            </form>
+            <form th:action="@{'/applications/'+${app.id}+'/status'}" method="post" style="display:inline">
+              <input type="hidden" name="status" value="REJECTED"/>
+              <button type="submit" class="btn-reject">✕ Reject</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+      <div class="section-card" style="margin-bottom:20px">
+        <div class="section-card-title" style="margin-bottom:16px">Quick Actions</div>
+        <a href="/jobs/new" class="btn btn-coral" style="width:100%;justify-content:center;border-radius:10px;margin-bottom:10px;display:flex">+ Post New Job</a>
+        <a href="/dashboard/employer/applicants" style="width:100%;justify-content:center;border-radius:10px;margin-bottom:10px;display:flex;padding:10px;background:var(--ink);color:#fff;text-decoration:none;font-size:.88rem;font-weight:500">View All Applicants</a>
+        <a href="/dashboard/employer/profile" class="btn-ghost-sm" style="width:100%;justify-content:center;display:flex;border-radius:10px">Edit Company Profile</a>
+      </div>
+
+      <!-- Summary card -->
+      <div class="section-card">
+        <div class="section-card-title" style="margin-bottom:16px">Account Info</div>
+        <div style="font-size:.85rem;color:var(--muted);display:flex;flex-direction:column;gap:10px">
+          <div><strong style="color:var(--ink)">Company</strong><br/><span th:text="${user.companyName?:'Not set'}">-</span></div>
+          <div><strong style="color:var(--ink)">Industry</strong><br/><span th:text="${user.industry?:'Not set'}">-</span></div>
+          <div><strong style="color:var(--ink)">Email</strong><br/><span th:text="${user.email}">-</span></div>
+          <div><strong style="color:var(--ink)">Size</strong><br/><span th:text="${user.companySize?:'Not set'}">-</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register | HireHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0F0E2A; --paper: #F7F5F0; --coral: #E8533A; --indigo: #4A3FDB;
+      --muted: #6B7280; --border: #E5E2D8; --success: #059669;
+      --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; }
+    
+    /* TOP NAV */
+    .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 20px 60px; border-bottom: 1px solid var(--border); background: #fff; }
+    .logo { font-family: var(--font-head); font-size: 1.5rem; font-weight: 800; text-decoration: none; color: var(--ink); }
+    .logo span { color: var(--coral); }
+    .top-bar a.back { font-size: 0.88rem; color: var(--muted); text-decoration: none; }
+    .top-bar a.back:hover { color: var(--ink); }
+
+    .page-wrap { max-width: 700px; margin: 0 auto; padding: 60px 24px 80px; }
+
+    .step-header { text-align: center; margin-bottom: 48px; }
+    .step-header h1 { font-family: var(--font-head); font-size: 2.2rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 8px; }
+    .step-header p { color: var(--muted); font-size: 0.95rem; }
+
+    /* ROLE CARDS */
+    .role-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px; }
+    .role-card {
+      border: 2px solid var(--border); border-radius: 16px; padding: 28px; cursor: pointer;
+      transition: all .2s; background: #fff; text-align: center; position: relative;
+    }
+    .role-card:hover { border-color: var(--indigo); box-shadow: 0 4px 20px rgba(74,63,219,.1); }
+    .role-card.selected { border-color: var(--indigo); background: #F5F3FF; box-shadow: 0 4px 24px rgba(74,63,219,.15); }
+    .role-card .check {
+      position: absolute; top: 14px; right: 14px; width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid var(--border); display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: #fff; transition: all .2s;
+    }
+    .role-card.selected .check { background: var(--indigo); border-color: var(--indigo); }
+    .role-emoji { font-size: 2rem; margin-bottom: 14px; }
+    .role-card h3 { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .role-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+    /* FORM */
+    .form-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 36px; }
+    .form-section-title { font-family: var(--font-head); font-size: 0.8rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { display: block; font-size: 0.82rem; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+    input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select, textarea {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: var(--font-body); font-size: 0.92rem; color: var(--ink); background: #fff;
+      outline: none; transition: border-color .2s; resize: vertical;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--indigo); }
+    select { cursor: pointer; }
+
+    .password-hint { font-size: 0.75rem; color: var(--muted); margin-top: 5px; }
+
+    .terms { display: flex; align-items: flex-start; gap: 10px; margin-top: 4px; }
+    .terms input { margin-top: 3px; flex-shrink: 0; }
+    .terms label { font-size: 0.83rem; color: var(--muted); cursor: pointer; }
+    .terms a { color: var(--indigo); text-decoration: none; }
+
+    .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+    .btn-submit {
+      width: 100%; padding: 14px; background: var(--ink); color: #fff; border: none; border-radius: 10px;
+      font-family: var(--font-head); font-size: 1rem; font-weight: 700; cursor: pointer;
+      transition: all .2s; letter-spacing: 0.01em; margin-top: 24px;
+    }
+    .btn-submit:hover { background: var(--indigo); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74,63,219,.3); }
+    .login-link { text-align: center; margin-top: 20px; font-size: 0.88rem; color: var(--muted); }
+    .login-link a { color: var(--indigo); text-decoration: none; font-weight: 500; }
+
+    /* Employer extra fields (hidden by default) */
+    #employerFields { display: none; }
+    #employerFields.visible { display: block; }
+
+    @media (max-width: 600px) {
+      .top-bar { padding: 16px 20px; }
+      .page-wrap { padding: 40px 16px 60px; }
+      .role-cards { grid-template-columns: 1fr; }
+      .form-card { padding: 24px; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/" class="logo">Hire<span>Hub</span></a>
+  <a href="/login" class="back">← Already have an account? Sign In</a>
+</div>
+
+<div class="page-wrap">
+  <div class="step-header">
+    <h1>Create Your Account</h1>
+    <p>Free to join. No credit card required.</p>
+  </div>
+
+  <!-- Role Selection -->
+  <div class="role-cards">
+    <div class="role-card selected" onclick="selectRole('seeker', this)">
+      <div class="check">✓</div>
+      <div class="role-emoji">👤</div>
+      <h3>Job Seeker</h3>
+      <p>Find jobs, build your profile, and apply to top companies.</p>
+    </div>
+    <div class="role-card" onclick="selectRole('employer', this)">
+      <div class="check">✓</div>
+      <div class="role-emoji">🏢</div>
+      <h3>Employer / Recruiter</h3>
+      <p>Post jobs and find qualified candidates for your team.</p>
+    </div>
+  </div>
+
+  <form th:action="@{/register}" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="role" id="roleInput" value="seeker" />
+
+    <div class="form-card">
+      <div class="form-section-title">Personal Information</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName" placeholder="Priya" required />
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName" placeholder="Sharma" required />
+        </div>
+        <div class="form-group full">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="priya@example.com" required />
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" placeholder="+91 98765 43210" />
+        </div>
+        <div class="form-group">
+          <label for="location">City / Location</label>
+          <input type="text" id="location" name="location" placeholder="Jaipur, Rajasthan" />
+        </div>
+      </div>
+
+      <!-- Job Seeker Fields -->
+      <div id="seekerFields">
+        <div class="divider"></div>
+        <div class="form-section-title">Professional Details</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="title">Current Title / Role</label>
+            <input type="text" id="title" name="title" placeholder="e.g. B.Tech CSE Student, Junior Developer" />
+          </div>
+          <div class="form-group">
+            <label for="experience">Experience Level</label>
+            <select id="experience" name="experience">
+              <option value="">Select level</option>
+              <option value="fresher">Fresher / Student</option>
+              <option value="0-1">0–1 Years</option>
+              <option value="1-3">1–3 Years</option>
+              <option value="3-5">3–5 Years</option>
+              <option value="5+">5+ Years</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="skills">Key Skills (comma-separated)</label>
+            <input type="text" id="skills" name="skills" placeholder="Java, Spring Boot, MySQL" />
+          </div>
+          <div class="form-group full">
+            <label for="resume">Upload Resume (PDF)</label>
+            <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" style="padding:8px;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Employer Fields -->
+      <div id="employerFields">
+        <div class="divider"></div>
+        <div class="form-section-title">Company Information</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="companyName">Company Name</label>
+            <input type="text" id="companyName" name="companyName" placeholder="Acme Technologies Pvt. Ltd." />
+          </div>
+          <div class="form-group">
+            <label for="industry">Industry</label>
+            <select id="industry" name="industry">
+              <option value="">Select industry</option>
+              <option>Information Technology</option>
+              <option>Finance & Banking</option>
+              <option>E-Commerce</option>
+              <option>Healthcare</option>
+              <option>Education</option>
+              <option>Manufacturing</option>
+              <option>Marketing & Advertising</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="companySize">Company Size</label>
+            <select id="companySize" name="companySize">
+              <option value="">Select size</option>
+              <option>1–10 employees</option>
+              <option>11–50 employees</option>
+              <option>51–200 employees</option>
+              <option>201–1000 employees</option>
+              <option>1000+ employees</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label for="companyWebsite">Company Website</label>
+            <input type="text" id="companyWebsite" name="companyWebsite" placeholder="https://yourcompany.com" />
+          </div>
+          <div class="form-group full">
+            <label for="companyDesc">About Your Company</label>
+            <textarea id="companyDesc" name="companyDesc" rows="3" placeholder="Briefly describe what your company does…"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="form-section-title">Account Security</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Min. 8 characters" required />
+          <div class="password-hint">Use at least 8 characters with a mix of letters and numbers.</div>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repeat password" required />
+        </div>
+      </div>
+
+      <div class="terms">
+        <input type="checkbox" id="agree" name="agree" required />
+        <label for="agree">I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>. My data will be stored securely and never sold to third parties.</label>
+      </div>
+
+      <button type="submit" class="btn-submit">Create Account →</button>
+    </div>
+
+    <div class="login-link">Already have an account? <a href="/login">Sign in here</a></div>
+  </form>
+</div>
+
+<script>
+  let selectedRole = 'seeker';
+
+  function selectRole(role, el) {
+    selectedRole = role;
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('roleInput').value = role;
+
+    if (role === 'employer') {
+      document.getElementById('seekerFields').style.display = 'none';
+      document.getElementById('employerFields').classList.add('visible');
+    } else {
+      document.getElementById('seekerFields').style.display = 'block';
+      document.getElementById('employerFields').classList.remove('visible');
+    }
+  }
+</script>
+</body>
+</html>

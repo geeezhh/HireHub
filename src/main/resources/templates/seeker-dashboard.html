@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Dashboard | HireHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#0F0E2A;--paper:#F7F5F0;--card:#fff;--coral:#E8533A;--indigo:#4A3FDB;--muted:#6B7280;--border:#E5E2D8;--sidebar-w:240px;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif}
+    body{font-family:var(--font-body);background:var(--paper);color:var(--ink);display:flex;min-height:100vh}
+    aside{width:var(--sidebar-w);background:var(--ink);color:#fff;display:flex;flex-direction:column;padding:28px 20px;position:fixed;top:0;left:0;bottom:0;z-index:50}
+    .logo{font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:#fff;text-decoration:none;padding-bottom:28px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:28px}
+    .logo span{color:var(--coral)}
+    .nav-group-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px}
+    .sidebar-nav{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:28px}
+    .sidebar-nav li a{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;font-size:.88rem;font-weight:500;color:rgba(255,255,255,.55);text-decoration:none;transition:all .2s}
+    .sidebar-nav li a:hover,.sidebar-nav li a.active{background:rgba(255,255,255,.08);color:#fff}
+    .sidebar-nav li a.active{background:rgba(74,63,219,.35)}
+    .sidebar-icon{font-size:1.05rem;width:20px;text-align:center}
+    .sidebar-bottom{margin-top:auto}
+    .user-chip{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,.06)}
+    .avatar{width:36px;height:36px;border-radius:50%;background:var(--coral);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:.85rem;color:#fff;flex-shrink:0}
+    .user-chip-name{font-size:.82rem;font-weight:600}
+    .user-chip-role{font-size:.72rem;color:rgba(255,255,255,.4)}
+    main{margin-left:var(--sidebar-w);flex:1;padding:36px 40px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+    .topbar h1{font-family:var(--font-head);font-size:1.5rem;font-weight:800}
+    .topbar p{font-size:.88rem;color:var(--muted);margin-top:2px}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:100px;font-family:var(--font-body);font-size:.88rem;font-weight:500;cursor:pointer;text-decoration:none;border:none;transition:all .2s}
+    .btn-primary{background:var(--ink);color:#fff}
+    .btn-primary:hover{background:var(--indigo)}
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px}
+    .stat-card-label{font-size:.78rem;font-weight:500;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+    .stat-card-val{font-family:var(--font-head);font-size:2rem;font-weight:800}
+    .stat-card-sub{font-size:.78rem;color:var(--muted);margin-top:4px}
+    .stat-card.highlight{background:var(--ink);color:#fff}
+    .stat-card.highlight .stat-card-label{color:rgba(255,255,255,.45)}
+    .stat-card.highlight .stat-card-val{color:var(--coral)}
+    .stat-card.highlight .stat-card-sub{color:rgba(255,255,255,.35)}
+    .grid-3-1{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+    .section-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px}
+    .section-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .section-card-title{font-family:var(--font-head);font-size:.95rem;font-weight:700}
+    .see-all{font-size:.8rem;color:var(--indigo);text-decoration:none;font-weight:500}
+    .app-table{width:100%;border-collapse:collapse}
+    .app-table th{font-size:.75rem;font-weight:600;color:var(--muted);text-align:left;padding:0 0 12px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+    .app-table td{padding:14px 0;border-bottom:1px solid var(--border);font-size:.86rem;vertical-align:middle}
+    .app-table tr:last-child td{border-bottom:none}
+    .app-company{display:flex;align-items:center;gap:10px}
+    .co-logo{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:.85rem;color:#fff;flex-shrink:0;background:var(--indigo)}
+    .co-name{font-weight:600;font-size:.88rem}
+    .co-role{font-size:.77rem;color:var(--muted)}
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;font-size:.75rem;font-weight:600}
+    .badge-applied{background:#EFF6FF;color:#1D4ED8}
+    .badge-shortlisted{background:#ECFDF5;color:#059669}
+    .badge-rejected{background:#FEF2F2;color:#DC2626}
+    .badge-reviewing{background:#FFFBEB;color:#D97706}
+    .job-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+    .job-item:last-child{border-bottom:none;padding-bottom:0}
+    .job-item-body{flex:1}
+    .job-item-title{font-weight:600;font-size:.88rem;margin-bottom:3px}
+    .job-item-meta{font-size:.78rem;color:var(--muted)}
+    .job-item-salary{font-size:.82rem;color:var(--indigo);font-weight:600;margin-top:4px}
+    .btn-apply{padding:7px 16px;background:var(--ink);color:#fff;border:none;border-radius:100px;font-family:var(--font-body);font-size:.78rem;font-weight:500;cursor:pointer;text-decoration:none;white-space:nowrap;flex-shrink:0}
+    .btn-apply:hover{background:var(--indigo)}
+    .profile-completion{background:linear-gradient(135deg,var(--ink),#2D2B72);color:#fff;border-radius:14px;padding:24px;margin-bottom:24px}
+    .pc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+    .pc-title{font-family:var(--font-head);font-size:.95rem;font-weight:700}
+    .pc-pct{font-family:var(--font-head);font-size:1.8rem;font-weight:800;color:var(--coral)}
+    .pc-bar{height:6px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden;margin-bottom:14px}
+    .pc-fill{height:100%;border-radius:100px;background:var(--coral)}
+    .pc-items{list-style:none;display:flex;flex-direction:column;gap:7px}
+    .pc-item{display:flex;align-items:center;gap:8px;font-size:.8rem;color:rgba(255,255,255,.6)}
+    .pc-item.done{color:rgba(255,255,255,.85)}
+    .pc-item .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0}
+    .pc-item.done .dot{background:#34D399}
+    .empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:.9rem}
+    .empty-state .ei{font-size:2rem;margin-bottom:10px}
+    .success-banner{background:#ECFDF5;border:1px solid #A7F3D0;color:#059669;padding:12px 18px;border-radius:10px;margin-bottom:20px;font-size:.88rem;font-weight:500}
+    @media(max-width:1100px){.stats-row{grid-template-columns:1fr 1fr}.grid-3-1{grid-template-columns:1fr}}
+    @media(max-width:768px){aside{display:none}main{margin-left:0;padding:24px 16px}.stats-row{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+
+<aside>
+  <a href="/" class="logo">Hire<span>Hub</span></a>
+  <div class="nav-group-label">Menu</div>
+  <ul class="sidebar-nav">
+    <li><a href="/dashboard/seeker" class="active"><span class="sidebar-icon">🏠</span> Dashboard</a></li>
+    <li><a href="/jobs"><span class="sidebar-icon">🔍</span> Browse Jobs</a></li>
+    <li><a href="/dashboard/seeker/applications"><span class="sidebar-icon">📋</span> My Applications</a></li>
+  </ul>
+  <div class="nav-group-label">Account</div>
+  <ul class="sidebar-nav">
+    <li><a href="/dashboard/seeker/profile"><span class="sidebar-icon">👤</span> My Profile</a></li>
+    <li><a href="/settings"><span class="sidebar-icon">⚙️</span> Settings</a></li>
+  </ul>
+  <div class="sidebar-bottom">
+    <div class="user-chip">
+      <!-- ✅ Real initials from DB -->
+      <div class="avatar"
+        th:text="${#strings.substring(user.firstName,0,1)}+${#strings.substring(user.lastName,0,1)}">??</div>
+      <div>
+        <div class="user-chip-name" th:text="${user.firstName + ' ' + user.lastName}">Name</div>
+        <div class="user-chip-role">Job Seeker</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <a href="/logout" style="display:flex;align-items:center;gap:10px;padding:10px 14px;color:rgba(255,255,255,.4);font-size:.82rem;text-decoration:none;border-radius:10px;transition:.2s"
+         onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='transparent'">
+        <span>🚪</span> Sign Out
+      </a>
+    </div>
+  </div>
+</aside>
+
+<main>
+  <!-- ✅ Success flash message after applying -->
+  <div class="success-banner" th:if="${successMsg}" th:text="${successMsg}"></div>
+
+  <div class="topbar">
+    <div>
+      <!-- ✅ Real user name -->
+      <h1>Welcome back, <span th:text="${user.firstName}">User</span> 👋</h1>
+      <p>Here's your job search overview.</p>
+    </div>
+    <a href="/jobs" class="btn btn-primary">Browse Jobs →</a>
+  </div>
+
+  <!-- ✅ Real stats from DB -->
+  <div class="stats-row">
+    <div class="stat-card highlight">
+      <div class="stat-card-label">Total Applied</div>
+      <div class="stat-card-val" th:text="${totalApplied}">0</div>
+      <div class="stat-card-sub">All applications</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Shortlisted</div>
+      <div class="stat-card-val" style="color:#059669" th:text="${shortlisted}">0</div>
+      <div class="stat-card-sub">Good news waiting!</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Jobs Available</div>
+      <div class="stat-card-val" style="color:#D97706" th:text="${allJobs.size()}">0</div>
+      <div class="stat-card-sub">Active listings</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Profile</div>
+      <div class="stat-card-val" th:text="${user.skills != null ? 'Active' : 'Setup'}">-</div>
+      <div class="stat-card-sub" th:text="${user.email}">email</div>
+    </div>
+  </div>
+
+  <!-- Profile Completion -->
+  <div class="profile-completion">
+    <div class="pc-head">
+      <div>
+        <div class="pc-title">Complete Your Profile</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.45);margin-top:3px">Stronger profiles get 3× more responses</div>
+      </div>
+      <!-- Each field = 20% -->
+      <div class="pc-pct"
+        th:with="pct=${(user.firstName!=null?20:0)+(user.resumePath!=null?20:0)+(user.skills!=null?20:0)+(user.phone!=null?20:0)+(user.location!=null?20:0)}"
+        th:text="${pct}+'%'">0%</div>
+    </div>
+    <div class="pc-bar">
+      <div class="pc-fill"
+        th:style="'width:'+${(user.firstName!=null?20:0)+(user.resumePath!=null?20:0)+(user.skills!=null?20:0)+(user.phone!=null?20:0)+(user.location!=null?20:0)}+'%'"></div>
+    </div>
+    <ul class="pc-items">
+      <li th:class="'pc-item'+(${user.firstName!=null}?' done':'')"><div class="dot"></div> Basic Info Added</li>
+      <li th:class="'pc-item'+(${user.resumePath!=null}?' done':'')"><div class="dot"></div> Resume Uploaded</li>
+      <li th:class="'pc-item'+(${user.skills!=null}?' done':'')"><div class="dot"></div> Skills Listed</li>
+      <li th:class="'pc-item'+(${user.phone!=null}?' done':'')"><div class="dot"></div> Phone Number Added</li>
+      <li th:class="'pc-item'+(${user.location!=null}?' done':'')"><div class="dot"></div> Location Added</li>
+    </ul>
+  </div>
+
+  <div class="grid-3-1">
+
+    <!-- ✅ Real applications from DB -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <div class="section-card-title">My Applications</div>
+        <a href="/dashboard/seeker/applications" class="see-all">View all →</a>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" th:if="${applications.isEmpty()}">
+        <div class="ei">📋</div>
+        You haven't applied to any jobs yet.<br/>
+        <a href="/jobs" style="color:var(--indigo);font-weight:600;text-decoration:none;margin-top:8px;display:inline-block">Browse jobs and apply →</a>
+      </div>
+
+      <!-- Real applications table -->
+      <table class="app-table" th:if="${!applications.isEmpty()}">
+        <thead><tr><th>Job / Company</th><th>Applied On</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr th:each="app : ${applications}">
+            <td>
+              <div class="app-company">
+                <div class="co-logo"
+                  th:text="${#strings.substring(app.jobPost.employer.companyName!=null?app.jobPost.employer.companyName:app.jobPost.employer.firstName,0,1)}">?</div>
+                <div>
+                  <div class="co-name" th:text="${app.jobPost.employer.companyName!=null?app.jobPost.employer.companyName:app.jobPost.employer.firstName+' '+app.jobPost.employer.lastName}">Company</div>
+                  <div class="co-role" th:text="${app.jobPost.jobTitle}">Role</div>
+                </div>
+              </div>
+            </td>
+            <td style="color:var(--muted)" th:text="${#temporals.format(app.appliedAt,'MMM dd, yyyy')}">Date</td>
+            <td>
+              <span th:class="'badge badge-'+${#strings.toLowerCase(app.status)}"
+                    th:text="${app.status}">APPLIED</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ✅ Real jobs from DB -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <div class="section-card-title">Latest Jobs</div>
+        <a href="/jobs" class="see-all">See all →</a>
+      </div>
+
+      <div class="empty-state" th:if="${allJobs.isEmpty()}">
+        <div class="ei">🔍</div>
+        No jobs posted yet.
+      </div>
+
+      <div th:each="job,iter : ${allJobs}" th:if="${iter.index < 5}" class="job-item">
+        <div class="co-logo" style="width:38px;height:38px;border-radius:10px;font-size:.8rem"
+          th:text="${#strings.substring(job.employer.companyName!=null?job.employer.companyName:job.employer.firstName,0,1)}">?</div>
+        <div class="job-item-body">
+          <div class="job-item-title" th:text="${job.jobTitle}">Title</div>
+          <div class="job-item-meta">
+            <span th:text="${job.employer.companyName!=null?job.employer.companyName:job.employer.firstName}">Co</span>
+            <span th:if="${job.location}"> · <span th:text="${job.location}"></span></span>
+          </div>
+          <div class="job-item-salary" th:if="${job.salaryMin!=null}">
+            ₹<span th:text="${job.salaryMin}"></span>–<span th:text="${job.salaryMax}"></span>
+          </div>
+        </div>
+        <a th:href="@{'/jobs/'+${job.id}+'/apply'}" class="btn-apply">Apply</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+</body>
+</html>

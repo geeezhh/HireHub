@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Dashboard | HireHub</title>
+  <style>
+    :root { --ink:#0f0e2a; --paper:#f7f5f0; --card:#fff; --coral:#e8533a; --indigo:#4a3fdb; --border:#e5e2d8; --muted:#6b7280; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: var(--paper); color: var(--ink); }
+    .wrap { max-width: 980px; margin: 28px auto; padding: 0 18px; }
+    .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+    .top h1 { font-size: 1.7rem; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+    .nav a { text-decoration:none; color:var(--ink); border:1px solid var(--border); background:#fff; padding:8px 12px; border-radius:999px; font-size:.9rem; }
+    .nav a.active { background:var(--ink); color:#fff; border-color:var(--ink); }
+    .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:18px; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .label { color:var(--muted); font-size:.82rem; margin-bottom:6px; text-transform:uppercase; }
+    .value { font-size:1.6rem; font-weight:700; }
+    .sections { display:grid; grid-template-columns: 2fr 1fr; gap:12px; }
+    .list { list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+    .list li { border:1px solid var(--border); border-radius:10px; padding:10px; background:#fff; }
+    .status { font-size:.78rem; padding:3px 8px; border-radius:999px; background:#eff6ff; color:#1d4ed8; margin-left:8px; }
+    .status.reviewing { background:#fffbeb; color:#b45309; }
+    .status.shortlisted { background:#ecfdf5; color:#047857; }
+    @media(max-width: 860px){ .grid { grid-template-columns:1fr; } .sections{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <h1>Welcome, Priya 👋</h1>
+      <div style="color:var(--muted)">Seeker Dashboard</div>
+    </div>
+
+    <div class="nav">
+      <a class="active" href="/report/dashboard">Dashboard</a>
+      <a href="/report/job-posting">Job Posting</a>
+      <a href="/report/applications">Applications</a>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="label">Applied Jobs</div>
+        <div class="value">12</div>
+      </div>
+      <div class="card">
+        <div class="label">Reviewing</div>
+        <div class="value">4</div>
+      </div>
+      <div class="card">
+        <div class="label">Shortlisted</div>
+        <div class="value">2</div>
+      </div>
+    </div>
+
+    <div class="sections">
+      <div class="card">
+        <h3>Recent Applications</h3>
+        <ul class="list">
+          <li>Frontend Developer - Novatech <span class="status">Applied</span></li>
+          <li>Java Backend Engineer - Vertex Labs <span class="status reviewing">Reviewing</span></li>
+          <li>UI Engineer - Pixel Works <span class="status shortlisted">Shortlisted</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Profile Section</h3>
+        <ul class="list">
+          <li>Name: Priya Sharma</li>
+          <li>Email: priya@email.com</li>
+          <li>Skills: Java, Spring Boot, React</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

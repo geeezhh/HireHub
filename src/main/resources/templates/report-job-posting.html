@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Job Posting | HireHub</title>
+  <style>
+    :root { --ink:#0f0e2a; --paper:#f7f5f0; --card:#fff; --coral:#e8533a; --border:#e5e2d8; --muted:#6b7280; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: var(--paper); color: var(--ink); }
+    .wrap { max-width: 900px; margin: 28px auto; padding: 0 18px; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; margin:14px 0 20px; }
+    .nav a { text-decoration:none; color:var(--ink); border:1px solid var(--border); background:#fff; padding:8px 12px; border-radius:999px; font-size:.9rem; }
+    .nav a.active { background:var(--ink); color:#fff; border-color:var(--ink); }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+    .row { margin-bottom:14px; }
+    .label { display:block; color:var(--muted); font-size:.82rem; margin-bottom:6px; text-transform:uppercase; }
+    .value { font-size:1rem; line-height:1.5; }
+    .skills { display:flex; gap:8px; flex-wrap:wrap; }
+    .skills span { background:#eef2ff; color:#3730a3; padding:4px 10px; border-radius:999px; font-size:.82rem; }
+    .submit { margin-top:8px; border:none; background:var(--coral); color:#fff; padding:10px 16px; border-radius:999px; cursor:pointer; font-size:.92rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Post a Job</h1>
+    <div class="nav">
+      <a href="/report/dashboard">Dashboard</a>
+      <a class="active" href="/report/job-posting">Job Posting</a>
+      <a href="/report/applications">Applications</a>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <span class="label">Job Title</span>
+        <div class="value">Senior Java Developer</div>
+      </div>
+      <div class="row">
+        <span class="label">Salary</span>
+        <div class="value">₹12 LPA - ₹18 LPA</div>
+      </div>
+      <div class="row">
+        <span class="label">Description</span>
+        <div class="value">Build backend APIs using Spring Boot, optimize SQL queries, and collaborate with frontend team for product delivery.</div>
+      </div>
+      <div class="row">
+        <span class="label">Skills</span>
+        <div class="skills">
+          <span>Java</span><span>Spring Boot</span><span>MySQL</span><span>REST APIs</span>
+        </div>
+      </div>
+      <button class="submit" type="button">Submit</button>
+    </div>
+  </div>
+</body>
+</html>

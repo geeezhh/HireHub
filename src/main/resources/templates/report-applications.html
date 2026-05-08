@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Applications | HireHub</title>
+  <style>
+    :root { --ink:#0f0e2a; --paper:#f7f5f0; --card:#fff; --indigo:#4a3fdb; --border:#e5e2d8; --muted:#6b7280; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: var(--paper); color: var(--ink); }
+    .wrap { max-width: 960px; margin: 28px auto; padding: 0 18px; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; margin:14px 0 20px; }
+    .nav a { text-decoration:none; color:var(--ink); border:1px solid var(--border); background:#fff; padding:8px 12px; border-radius:999px; font-size:.9rem; }
+    .nav a.active { background:var(--ink); color:#fff; border-color:var(--ink); }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+    table { width:100%; border-collapse:collapse; }
+    th { text-align:left; font-size:.78rem; text-transform:uppercase; color:var(--muted); padding-bottom:10px; border-bottom:1px solid var(--border); }
+    td { padding:12px 0; border-bottom:1px solid var(--border); font-size:.94rem; }
+    tr:last-child td { border-bottom:none; }
+    .status { font-size:.78rem; padding:4px 10px; border-radius:999px; }
+    .applied { background:#eff6ff; color:#1d4ed8; }
+    .reviewing { background:#fffbeb; color:#b45309; }
+    .shortlisted { background:#ecfdf5; color:#047857; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>My Applications</h1>
+    <div class="nav">
+      <a href="/report/dashboard">Dashboard</a>
+      <a href="/report/job-posting">Job Posting</a>
+      <a class="active" href="/report/applications">Applications</a>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:14px;">Applied Jobs List</h3>
+      <table>
+        <thead>
+          <tr><th>Job Title</th><th>Company</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Frontend Developer</td><td>Novatech</td><td><span class="status applied">Applied</span></td></tr>
+          <tr><td>Backend Engineer</td><td>Vertex Labs</td><td><span class="status reviewing">Reviewing</span></td></tr>
+          <tr><td>Software Engineer</td><td>CodeBridge</td><td><span class="status shortlisted">Shortlisted</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
