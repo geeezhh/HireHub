@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Companies &amp; career portals | HireHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0f0e2a;
+      --paper: #f7f5f0;
+      --coral: #e8533a;
+      --indigo: #4a3fdb;
+      --muted: #6b7280;
+      --border: #e5e2d8;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--paper); color: var(--ink); line-height: 1.55; }
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 40px; background: rgba(247,245,240,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: var(--font-head); font-size: 1.35rem; font-weight: 800; color: var(--ink); text-decoration: none; }
+    .nav-logo span { color: var(--coral); }
+    .nav-links { display: flex; gap: 24px; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+    .nav-links a:hover, .nav-links a.active { color: var(--ink); }
+    .hero { padding: 56px 40px 40px; max-width: 1100px; margin: 0 auto; }
+    .hero h1 { font-family: var(--font-head); font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 12px; }
+    .hero p { color: var(--muted); max-width: 640px; font-size: 1.05rem; }
+    .note {
+      margin-top: 20px; padding: 14px 18px; border-radius: 12px;
+      background: #fff; border: 1px solid var(--border); font-size: 0.88rem; color: #4b5563;
+    }
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 22px; padding: 0 40px 48px; max-width: 1280px; margin: 0 auto;
+    }
+    .card {
+      background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 24px;
+      display: flex; flex-direction: column; gap: 14px;
+      transition: box-shadow 0.25s, transform 0.25s;
+    }
+    .card:hover { box-shadow: 0 12px 40px rgba(15,14,42,0.08); transform: translateY(-2px); }
+    .card-top { display: flex; gap: 14px; align-items: flex-start; }
+    .logo {
+      width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head); font-weight: 800; font-size: 1.1rem; color: #fff;
+      background: var(--indigo);
+    }
+    .card h2 { font-family: var(--font-head); font-size: 1.15rem; font-weight: 800; }
+    .industry { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--coral); }
+    .tagline { font-size: 0.88rem; color: var(--muted); }
+    .titles { display: flex; flex-wrap: wrap; gap: 6px; }
+    .titles span {
+      font-size: 0.72rem; padding: 5px 10px; border-radius: 100px;
+      background: #f3f4f6; color: #374151; font-weight: 500;
+    }
+    .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .links a {
+      font-size: 0.78rem; font-weight: 600; padding: 8px 12px; border-radius: 10px;
+      text-decoration: none; border: 1px solid var(--border); color: var(--ink);
+      background: var(--paper); transition: background 0.2s, border-color 0.2s;
+    }
+    .links a:hover { border-color: var(--indigo); background: #eef2ff; }
+    .links a.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .links a.primary:hover { background: var(--indigo); border-color: var(--indigo); }
+    .links a.reddit { border-color: #ff4500; color: #c2410c; background: #fff7ed; }
+    .links a.google { border-color: #4285f4; color: #1d4ed8; background: #eff6ff; }
+    .hub-box {
+      margin-top: 10px; padding-top: 14px; border-top: 1px dashed var(--border);
+      font-size: 0.82rem;
+    }
+    .hub-box strong { display: block; margin-bottom: 8px; font-size: 0.78rem; color: var(--indigo); text-transform: uppercase; letter-spacing: 0.05em; }
+    .hub-box ul { list-style: none; }
+    .hub-box li { margin-bottom: 6px; }
+    .hub-box a { color: var(--indigo); font-weight: 600; text-decoration: none; }
+    .hub-box a:hover { text-decoration: underline; }
+    .hub-empty { color: var(--muted); font-style: italic; }
+    section.discovery {
+      max-width: 1100px; margin: 0 auto 64px; padding: 32px 40px;
+      background: var(--ink); color: #fff; border-radius: 20px;
+    }
+    section.discovery h2 { font-family: var(--font-head); font-size: 1.4rem; margin-bottom: 8px; }
+    section.discovery > p { color: rgba(255,255,255,0.55); font-size: 0.92rem; margin-bottom: 20px; }
+    .discovery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .discovery-grid a {
+      display: block; padding: 14px 16px; border-radius: 12px;
+      background: rgba(255,255,255,0.08); color: #fff; text-decoration: none; font-weight: 600; font-size: 0.88rem;
+      border: 1px solid rgba(255,255,255,0.12); transition: background 0.2s;
+    }
+    .discovery-grid a:hover { background: rgba(255,255,255,0.14); }
+    .discovery-grid a small { display: block; font-weight: 400; font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-top: 4px; }
+    footer { text-align: center; padding: 24px; color: var(--muted); font-size: 0.82rem; }
+    footer a { color: var(--indigo); }
+    @media (max-width: 640px) {
+      nav { padding: 14px 18px; flex-wrap: wrap; gap: 12px; }
+      .hero, .grid { padding-left: 18px; padding-right: 18px; }
+      section.discovery { margin-left: 18px; margin-right: 18px; padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Hire<span>Hub</span></a>
+  <ul class="nav-links">
+    <li><a href="/jobs">Browse Jobs</a></li>
+    <li><a href="/companies" class="active">Companies</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+  <a href="/login" style="font-size:0.9rem;font-weight:600;color:var(--indigo);text-decoration:none;">Sign in</a>
+</nav>
+
+<div class="hero">
+  <h1>Tech companies &amp; where to apply</h1>
+  <p>
+    Explore major employers, typical role families, and <strong>official career portals</strong> plus LinkedIn job hubs.
+    When someone posts on HireHub with a matching company name, those roles appear here too — apply without leaving our site.
+  </p>
+  <div class="note">
+    <strong style="color:var(--ink);">Why not auto-scrape Google or LinkedIn?</strong>
+    HireHub links only to public career pages and community search URLs. Live scraping would break those sites’ terms of service
+    and break when layouts change. You can always open Google or LinkedIn from the shortcuts below.
+  </div>
+</div>
+
+<div class="grid">
+  <article class="card" th:each="c : ${companies}" th:with="hubJobs=${jobsByCompanyKey[c.matchKeyword]}">
+    <div class="card-top">
+      <div class="logo" th:text="${#strings.substring(c.name,0,1)}">G</div>
+      <div>
+        <div class="industry" th:text="${c.industry}">Industry</div>
+        <h2 th:text="${c.name}">Company</h2>
+        <p class="tagline" th:text="${c.tagline}">Tagline</p>
+      </div>
+    </div>
+    <div class="titles">
+      <span th:each="t : ${c.sampleJobTitles}" th:text="${t}">Role</span>
+    </div>
+    <div class="links">
+      <a class="primary" th:href="${c.careersUrl}" target="_blank" rel="noopener noreferrer">Official careers</a>
+      <a th:href="${c.linkedinJobsUrl}" target="_blank" rel="noopener noreferrer">LinkedIn jobs</a>
+      <a class="reddit" th:href="${c.redditDiscussUrl}" target="_blank" rel="noopener noreferrer">Reddit (CSQ)</a>
+      <a class="google" th:href="${c.googleSearchJobsUrl}" target="_blank" rel="noopener noreferrer">Google search</a>
+    </div>
+    <div class="hub-box" th:if="${hubJobs != null and !hubJobs.isEmpty()}">
+      <strong>On HireHub right now</strong>
+      <ul>
+        <li th:each="job : ${hubJobs}">
+          <a th:href="@{/jobs(q=${job.jobTitle})}" th:text="${job.jobTitle}">Job title</a>
+          <span style="color:var(--muted);font-weight:400;"> — open in HireHub job search</span>
+        </li>
+      </ul>
+    </div>
+    <div class="hub-box hub-empty" th:if="${hubJobs == null or hubJobs.isEmpty()}">
+      No active HireHub listings matched this name yet. Post as an employer with this company name, or apply via the external links.
+    </div>
+  </article>
+</div>
+
+<section class="discovery" aria-labelledby="disc-title">
+  <h2 id="disc-title">Cast a wider net</h2>
+  <p>Jump to big job boards and communities (especially tech). These open in a new tab.</p>
+  <div class="discovery-grid">
+    <a href="https://www.linkedin.com/jobs/" target="_blank" rel="noopener noreferrer">
+      LinkedIn Jobs
+      <small>Global role search &amp; Easy Apply</small>
+    </a>
+    <a href="https://www.google.com/search?q=software+engineer+jobs+remote+2026" target="_blank" rel="noopener noreferrer">
+      Google (tech jobs)
+      <small>Pre-filled search — adjust filters in Google</small>
+    </a>
+    <a href="https://www.reddit.com/r/forhire/" target="_blank" rel="noopener noreferrer">
+      r/forhire
+      <small>Contract &amp; full-time posts from teams</small>
+    </a>
+    <a href="https://www.reddit.com/r/cscareerquestions/" target="_blank" rel="noopener noreferrer">
+      r/cscareerquestions
+      <small>Interviews, offers, Big Tech discussion</small>
+    </a>
+    <a href="https://www.reddit.com/r/developersIndia/" target="_blank" rel="noopener noreferrer">
+      r/developersIndia
+      <small>India tech hiring &amp; career threads</small>
+    </a>
+    <a href="https://www.reddit.com/r/ExperiencedDevs/" target="_blank" rel="noopener noreferrer">
+      r/ExperiencedDevs
+      <small>Senior IC &amp; staff-level topics</small>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <a href="/jobs">All HireHub listings</a> ·
+  <a href="/register">Employer signup</a> — add your company so seekers apply here.
+</footer>
+
+</body>
+</html>

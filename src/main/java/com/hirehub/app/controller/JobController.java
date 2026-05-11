@@ -95,7 +95,7 @@ public class JobController {
 
         // Don't apply twice
         if (jobApplicationRepository.existsBySeekerAndJobPost(seeker, job)) {
-            return "redirect:/dashboard/seeker?alreadyApplied=true";
+            return "redirect:/jobs?alreadyApplied=true";
         }
 
         JobApplication application = new JobApplication();
@@ -105,7 +105,7 @@ public class JobController {
 
         jobApplicationRepository.save(application);
 
-        return "redirect:/dashboard/seeker?applied=true";
+        return "redirect:/jobs?applied=true";
     }
 
     // ── UPDATE APPLICATION STATUS (Employer shortlist/reject) ─

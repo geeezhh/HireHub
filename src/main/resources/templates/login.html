@@ -125,6 +125,9 @@
       <button class="role-tab" onclick="setRole(this,'admin')">Admin</button>
     </div>
 
+    <div th:if="${error}" style="background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;padding:12px 14px;border-radius:10px;margin-bottom:18px;font-size:0.88rem;font-weight:500;"
+         th:text="${error}">Error</div>
+
     <form th:action="@{/login}" method="post">
       <input type="hidden" name="role" id="roleField" value="seeker" />
 

@@ -1,15 +1,23 @@
 package com.hirehub.app;
 
+import com.hirehub.app.entity.JobPost;
 import com.hirehub.app.entity.User;
 import com.hirehub.app.repository.JobApplicationRepository;
 import com.hirehub.app.repository.JobPostRepository;
 import com.hirehub.app.repository.UserRepository;
+import com.hirehub.app.showcase.CompanyDirectory;
+import com.hirehub.app.showcase.CompanyShowcase;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class HomeController {
@@ -20,6 +28,8 @@ public class HomeController {
     private JobApplicationRepository jobApplicationRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CompanyDirectory companyDirectory;
 
     @GetMapping("/")
     public String home() {
@@ -98,23 +108,63 @@ public class HomeController {
 
     // ── Placeholder routes (no 404) ───────────────────────────
     @GetMapping("/jobs")
-    public String jobs(@RequestParam(required = false) String q, Model model) {
+    public String jobs(@RequestParam(required = false) String q, Model model, HttpSession session,
+            @RequestParam(required = false) String applied,
+            @RequestParam(required = false) String alreadyApplied) {
+        User user = (User) session.getAttribute("loggedInUser");
+        model.addAttribute("loggedInUser", user);
+
         if (q != null && !q.isBlank()) {
             model.addAttribute("jobs", jobPostRepository.searchJobs(q));
         } else {
             model.addAttribute("jobs", jobPostRepository.findByStatusOrderByCreatedAtDesc("ACTIVE"));
         }
-        return "index";
+
+        if (applied != null) {
+            model.addAttribute("successMsg", "Application submitted successfully.");
+        }
+        if (alreadyApplied != null) {
+            model.addAttribute("infoMsg", "You already applied to this job.");
+        }
+
+        return "jobs";
     }
 
     @GetMapping("/companies")
-    public String companies() {
-        return "index";
+    public String companies(Model model) {
+        List<JobPost> activeJobs = jobPostRepository.findByStatusOrderByCreatedAtDesc("ACTIVE");
+        model.addAttribute("hireHubJobs", activeJobs);
+
+        Map<String, List<JobPost>> jobsByCompanyKey = new HashMap<>();
+        for (CompanyShowcase c : companyDirectory.getShowcase()) {
+            String kw = c.matchKeyword().toLowerCase();
+            List<JobPost> matches = activeJobs.stream()
+                    .filter(j -> employerMatchesKeyword(j.getEmployer(), kw))
+                    .limit(6)
+                    .collect(Collectors.toList());
+            jobsByCompanyKey.put(c.matchKeyword(), matches);
+        }
+        model.addAttribute("jobsByCompanyKey", jobsByCompanyKey);
+        model.addAttribute("companies", companyDirectory.getShowcase());
+        return "companies";
+    }
+
+    private static boolean employerMatchesKeyword(User employer, String kw) {
+        if (employer == null || kw == null || kw.isBlank()) {
+            return false;
+        }
+        if (employer.getCompanyName() != null
+                && employer.getCompanyName().toLowerCase().contains(kw)) {
+            return true;
+        }
+        String full = ((employer.getFirstName() == null ? "" : employer.getFirstName()) + " "
+                + (employer.getLastName() == null ? "" : employer.getLastName())).trim().toLowerCase();
+        return full.contains(kw);
     }
 
     @GetMapping("/about")
     public String about() {
-        return "index";
+        return "about";
     }
 
     @GetMapping("/contact")

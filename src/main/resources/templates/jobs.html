@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browse Jobs | HireHub</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f6f5f2; color: #111827; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 40px; }
+    .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 12px; }
+    .top a { color: #4a3fdb; text-decoration: none; font-weight: 600; }
+    h1 { font-size: 1.8rem; }
+    .msg { border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 0.95rem; }
+    .msg.success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+    .msg.info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+    .search { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; margin-bottom: 16px; display: flex; gap: 10px; }
+    .search input { flex: 1; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px; }
+    .search button { background: #111827; color: #fff; border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer; }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .title { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .meta { color: #6b7280; font-size: 0.9rem; margin-bottom: 8px; }
+    .desc { color: #374151; font-size: 0.92rem; margin-bottom: 10px; }
+    .actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .salary { font-weight: 600; color: #4a3fdb; }
+    .btn { border: none; border-radius: 999px; padding: 8px 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+    .btn.apply { background: #111827; color: #fff; }
+    .btn.login { background: #4a3fdb; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <h1>Browse Jobs</h1>
+      <a href="/">Home</a>
+    </div>
+
+    <div class="msg success" th:if="${successMsg}" th:text="${successMsg}"></div>
+    <div class="msg info" th:if="${infoMsg}" th:text="${infoMsg}"></div>
+
+    <form class="search" action="/jobs" method="get">
+      <input type="text" name="q" placeholder="Search jobs by title, skills, location..." />
+      <button type="submit">Search</button>
+    </form>
+
+    <div class="card" th:if="${jobs.isEmpty()}">
+      No active jobs right now.
+    </div>
+
+    <div class="card" th:each="job : ${jobs}">
+      <div class="title" th:text="${job.jobTitle}">Job Title</div>
+      <div class="meta">
+        <span th:text="${job.employer.companyName != null ? job.employer.companyName : job.employer.fullName}">Company</span>
+        <span th:if="${job.location}"> · <span th:text="${job.location}">Location</span></span>
+        <span th:if="${job.jobType}"> · <span th:text="${job.jobType}">Type</span></span>
+      </div>
+      <div class="desc" th:if="${job.jobDescription}" th:text="${job.jobDescription}"></div>
+      <div class="actions">
+        <div class="salary" th:if="${job.salaryMin != null}">
+          ₹<span th:text="${job.salaryMin}"></span> - ₹<span th:text="${job.salaryMax}"></span>
+        </div>
+        <div>
+          <form th:if="${loggedInUser != null and loggedInUser.role == 'SEEKER'}"
+                th:action="@{'/jobs/'+${job.id}+'/apply'}" method="post" style="display:inline;">
+            <button type="submit" class="btn apply">Apply Now</button>
+          </form>
+          <a th:if="${loggedInUser == null}" href="/login" class="btn login">Login to Apply</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

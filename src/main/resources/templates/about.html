@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About &amp; Insights | HireHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0a0a0f;
+      --paper: #f4f2ec;
+      --coral: #e8533a;
+      --indigo: #5b4dff;
+      --mint: #3dd9a5;
+      --muted: #8a8794;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--ink);
+      color: var(--paper);
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* ambient cursor glow */
+    #cursor-glow {
+      pointer-events: none;
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(91, 77, 255, 0.22) 0%, transparent 68%);
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.5s var(--ease-out);
+      mix-blend-mode: screen;
+    }
+    body.ready #cursor-glow { opacity: 1; }
+
+    .noise {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* nav */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(10, 10, 15, 0.72);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-logo {
+      font-family: var(--font-head);
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fff;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--coral); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: rgba(255,255,255,0.55);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: color 0.25s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 100px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.3s var(--ease-out), box-shadow 0.3s;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(91, 77, 255, 0.35); }
+
+    /* hero */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 48px 80px;
+      z-index: 1;
+    }
+    .mesh {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 20%, rgba(232, 83, 58, 0.35) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 85% 30%, rgba(91, 77, 255, 0.45) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 40% at 50% 100%, rgba(61, 217, 165, 0.2) 0%, transparent 45%);
+      filter: blur(0px);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 100px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      width: fit-content;
+      margin-bottom: 28px;
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    .hero-badge .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--mint);
+      box-shadow: 0 0 12px var(--mint);
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2.8rem, 7vw, 5.2rem);
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      max-width: 12ch;
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(120deg, var(--coral), var(--indigo), var(--mint));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-sub {
+      margin-top: 28px;
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.55);
+      max-width: 480px;
+      line-height: 1.65;
+      opacity: 0;
+      transform: translateY(32px);
+    }
+
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      margin-top: 48px;
+      opacity: 0;
+      transform: translateY(28px);
+    }
+    .hero-stat strong {
+      font-family: var(--font-head);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      display: block;
+    }
+    .hero-stat span { font-size: 0.82rem; color: var(--muted); }
+
+    .reveal-in { opacity: 1 !important; transform: none !important; transition: opacity 1s var(--ease-out), transform 1s var(--ease-out); }
+
+    /* scroll progress */
+    #read-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--coral), var(--indigo));
+      z-index: 101;
+      transform-origin: left;
+    }
+
+    /* marquee */
+    .marquee-wrap {
+      overflow: hidden;
+      border-block: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      padding: 18px 0;
+    }
+    .marquee {
+      display: flex;
+      gap: 48px;
+      width: max-content;
+      animation: marquee 28s linear infinite;
+      font-family: var(--font-head);
+      font-size: clamp(1.5rem, 3vw, 2.4rem);
+      font-weight: 800;
+      color: rgba(255,255,255,0.12);
+      white-space: nowrap;
+    }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { .marquee { animation: none; } }
+
+    /* section */
+    section {
+      position: relative;
+      padding: 100px 48px;
+      z-index: 1;
+    }
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--coral);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      max-width: 700px;
+      margin-bottom: 48px;
+    }
+
+    /* story cards horizontal */
+    .story-rail {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      padding-bottom: 16px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--indigo) transparent;
+    }
+    .story-rail::-webkit-scrollbar { height: 6px; }
+    .story-rail::-webkit-scrollbar-thumb { background: var(--indigo); border-radius: 99px; }
+
+    .story-card {
+      flex: 0 0 min(85vw, 420px);
+      scroll-snap-align: start;
+      border-radius: 20px;
+      padding: 32px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: transform 0.5s var(--ease-out), border-color 0.4s;
+    }
+    .story-card:hover { transform: scale(1.02); border-color: rgba(91, 77, 255, 0.5); }
+    .story-card h3 {
+      font-family: var(--font-head);
+      font-size: 1.35rem;
+      margin-bottom: 12px;
+    }
+    .story-card p { color: rgba(255,255,255,0.55); font-size: 0.92rem; line-height: 1.65; }
+
+    /* blog grid */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px;
+    }
+
+    .blog-feature {
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      min-height: 380px;
+    }
+    @media (max-width: 900px) {
+      .blog-feature { grid-template-columns: 1fr; }
+    }
+
+    .blog-feature-visual {
+      position: relative;
+      background: linear-gradient(135deg, #1a1530, #2d1f45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    .orbit {
+      width: min(280px, 70vw);
+      height: min(280px, 70vw);
+      border-radius: 50%;
+      border: 1px dashed rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: spin 24s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .orbit { animation: none; } }
+    .orbit-inner {
+      width: 72%;
+      height: 72%;
+      border-radius: 50%;
+      background: conic-gradient(from 180deg, var(--coral), var(--indigo), var(--mint), var(--coral));
+      opacity: 0.85;
+      filter: blur(0);
+    }
+
+    .blog-feature-body {
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: rgba(255,255,255,0.03);
+    }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 6px 12px;
+      border-radius: 100px;
+      background: rgba(91, 77, 255, 0.25);
+      color: #d4ccff;
+    }
+    .blog-feature-body h2 {
+      font-family: var(--font-head);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+    .blog-feature-body p { color: rgba(255,255,255,0.55); line-height: 1.7; margin-bottom: 24px; }
+    .read-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--mint);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-decoration: none;
+      width: fit-content;
+      transition: gap 0.3s var(--ease-out);
+    }
+    .read-link:hover { gap: 14px; }
+
+    .blog-card {
+      grid-column: span 4;
+      border-radius: 20px;
+      padding: 28px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: border-color 0.35s, background 0.35s;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    @media (max-width: 1100px) { .blog-card { grid-column: span 6; } }
+    @media (max-width: 640px) { .blog-card { grid-column: span 12; } }
+
+    .blog-card:hover {
+      border-color: rgba(232, 83, 58, 0.35);
+      background: rgba(255,255,255,0.06);
+    }
+    .blog-card .meta { font-size: 0.78rem; color: var(--muted); margin-bottom: 12px; }
+    .blog-card h3 {
+      font-family: var(--font-head);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.25;
+    }
+    .blog-card p { font-size: 0.88rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+    /* sticky chapter nav */
+    .chapters {
+      position: sticky;
+      top: 100px;
+      align-self: start;
+    }
+    .chapter-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .chapter-list a {
+      display: block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: background 0.25s, color 0.25s;
+    }
+    .chapter-list a:hover, .chapter-list a.active {
+      background: rgba(91, 77, 255, 0.2);
+      color: #fff;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .two-col { grid-template-columns: 1fr; }
+      .chapters { position: relative; top: 0; }
+      .chapter-list { flex-direction: row; flex-wrap: wrap; }
+    }
+
+    .article-block {
+      margin-bottom: 64px;
+      scroll-margin-top: 100px;
+    }
+    .article-block h2 {
+      font-family: var(--font-head);
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .article-block p {
+      color: rgba(255,255,255,0.58);
+      line-height: 1.75;
+      margin-bottom: 16px;
+      font-size: 1.02rem;
+    }
+
+    /* interactive quote */
+    .quote-box {
+      margin: 48px 0;
+      padding: 40px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: linear-gradient(120deg, rgba(91,77,255,0.15), rgba(232,83,58,0.1));
+      position: relative;
+      overflow: hidden;
+    }
+    .quote-box::before {
+      content: '"';
+      position: absolute;
+      top: -20px;
+      left: 20px;
+      font-family: var(--font-head);
+      font-size: 8rem;
+      line-height: 1;
+      color: rgba(255,255,255,0.06);
+      pointer-events: none;
+    }
+    .quote-box blockquote {
+      font-family: var(--font-head);
+      font-size: 1.35rem;
+      font-weight: 600;
+      line-height: 1.4;
+      position: relative;
+    }
+    .quote-box cite {
+      display: block;
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: normal;
+    }
+
+    /* CTA */
+    .cta-band {
+      margin: 40px 48px 80px;
+      padding: 64px 48px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #fff 0%, #e8e4f8 100%);
+      color: var(--ink);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-band h2 {
+      font-family: var(--font-head);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .cta-band p { color: #5c5a66; margin-bottom: 28px; max-width: 520px; margin-inline: auto; }
+    .cta-input-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .cta-input-wrap input {
+      flex: 1;
+      min-width: 200px;
+      padding: 14px 20px;
+      border-radius: 100px;
+      border: 1.5px solid rgba(10,10,15,0.15);
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+    }
+    .cta-input-wrap button {
+      padding: 14px 28px;
+      border-radius: 100px;
+      border: none;
+      background: var(--ink);
+      color: #fff;
+      font-family: var(--font-head);
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.25s var(--ease-out);
+    }
+    .cta-input-wrap button:hover { transform: scale(1.04); }
+
+    footer {
+      padding: 40px 48px 48px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 24px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    footer a { color: #fff; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<div id="cursor-glow" aria-hidden="true"></div>
+<div class="noise" aria-hidden="true"></div>
+<div id="read-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+
+<nav>
+  <a href="/" class="nav-logo">Hire<span>Hub</span></a>
+  <ul class="nav-links">
+    <li><a href="/jobs">Browse Jobs</a></li>
+    <li><a href="/companies">Companies</a></li>
+    <li><a href="/about" class="active">About</a></li>
+  </ul>
+  <a href="/register" class="nav-cta">Join HireHub →</a>
+</nav>
+
+<header class="hero">
+  <div class="mesh" aria-hidden="true"></div>
+  <div class="hero-badge" data-reveal>
+    <span class="dot"></span>
+    Stories, research &amp; playbooks for modern hiring
+  </div>
+  <h1 data-reveal>We build the bridge between <em>talent</em> and teams.</h1>
+  <p class="hero-sub" data-reveal>
+    HireHub is more than listings. This space is our lab: essays on hiring culture, async interviews,
+    and the small UX details that make candidates say yes.
+  </p>
+  <div class="hero-stats" data-reveal>
+    <div class="hero-stat"><strong>120+</strong><span>Articles &amp; guides</span></div>
+    <div class="hero-stat"><strong>48k</strong><span>Monthly readers</span></div>
+    <div class="hero-stat"><strong>14</strong><span>Contributors</span></div>
+  </div>
+</header>
+
+<div class="marquee-wrap" aria-hidden="true">
+  <div class="marquee">
+    <span>Future of work · Candidate experience · Employer brand · Remote hiring · AI &amp; ethics ·</span>
+    <span>Future of work · Candidate experience · Employer brand · Remote hiring · AI &amp; ethics ·</span>
+  </div>
+</div>
+
+<section id="magazine">
+  <div class="section-label">The magazine</div>
+  <h2 class="section-title" data-reveal>Ideas worth scrolling for — sharp writing, interactive layouts, zero fluff.</h2>
+
+  <div class="blog-grid">
+    <article class="blog-feature" data-tilt data-reveal>
+      <div class="blog-feature-visual">
+        <div class="orbit"><div class="orbit-inner"></div></div>
+      </div>
+      <div class="blog-feature-body">
+        <div class="tag-row">
+          <span class="tag">Featured</span>
+          <span class="tag">8 min read</span>
+        </div>
+        <h2>The invisible cost of a slow first reply</h2>
+        <p>
+          Data from thousands of applications shows how response latency shapes offer acceptance.
+          We break down the psychology and give a same-day reply playbook your team can steal.
+        </p>
+        <a href="#ch-slow-reply" class="read-link">Start reading →</a>
+      </div>
+    </article>
+
+    <article class="blog-card" data-tilt data-reveal>
+      <div class="meta">Mar 02 · Design</div>
+      <h3>Micro-interactions that signal “we respect your time”</h3>
+      <p>From progress bars to honest error copy — tiny UI choices that lift completion rates on long forms.</p>
+    </article>
+    <article class="blog-card" data-tilt data-reveal>
+      <div class="meta">Feb 18 · Culture</div>
+      <h3>Why “culture fit” became a dirty word — and what to say instead</h3>
+      <p>Reframing values alignment without homogeneity. Includes interview question templates.</p>
+    </article>
+    <article class="blog-card" data-tilt data-reveal>
+      <div class="meta">Jan 30 · Data</div>
+      <h3>Salary bands in public listings: a field experiment</h3>
+      <p>What happened when 200 employers A/B tested transparent ranges on HireHub.</p>
+    </article>
+  </div>
+</section>
+
+<section id="deep-dives" style="background: rgba(255,255,255,0.02);">
+  <div class="section-label">Scroll stories</div>
+  <h2 class="section-title" data-reveal>Swipe through moments that shaped how we think about hiring.</h2>
+  <div class="story-rail" data-reveal>
+    <div class="story-card">
+      <h3>2019 · The spark</h3>
+      <p>Two students watched friends ghosted by black-box ATS tools. The first wireframes were sketched on a café napkin.</p>
+    </div>
+    <div class="story-card">
+      <h3>2021 · Open beta</h3>
+      <p>We shipped seeker-first dashboards: applications you can actually track, with human-readable statuses.</p>
+    </div>
+    <div class="story-card">
+      <h3>2024 · Scale</h3>
+      <p>Employers across India adopted transparent pipelines. This blog became our R&amp;D loudspeaker.</p>
+    </div>
+    <div class="story-card">
+      <h3>2026 · Now</h3>
+      <p>We are experimenting with collaborative shortlists and ethical AI assist — always opt-in, always explainable.</p>
+    </div>
+  </div>
+</section>
+
+<section id="read">
+  <div class="section-label">Long reads</div>
+  <h2 class="section-title" data-reveal>Chaptered articles — pick a thread and read at your pace.</h2>
+
+  <div class="two-col" data-reveal>
+    <aside class="chapters">
+      <ul class="chapter-list" id="chapter-nav">
+        <li><a href="#ch-slow-reply">Slow reply tax</a></li>
+        <li><a href="#ch-async">Async interviews</a></li>
+        <li><a href="#ch-feedback">Feedback loops</a></li>
+      </ul>
+    </aside>
+    <div>
+      <article class="article-block" id="ch-slow-reply">
+        <h2>The slow-reply tax</h2>
+        <p>
+          Candidates infer company culture from the first touchpoint. When the median acknowledgement stretches past 48 hours,
+          drop-off spikes — not because people are impatient, but because silence reads as disorganisation.
+        </p>
+        <p>
+          Try a triage inbox: auto-acknowledge with a human tone, route by role family, and set SLAs visible to the whole team.
+        </p>
+        <div class="quote-box">
+          <blockquote>Speed is a proxy for respect. You do not need a perfect answer on hour one — you need a human signal.</blockquote>
+          <cite>— HireHub editorial, from 2,400 recruiter interviews</cite>
+        </div>
+      </article>
+      <article class="article-block" id="ch-async">
+        <h2>Async interviews that feel fair</h2>
+        <p>
+          Recorded questions can feel cold. The fix is structure: time boxes, retries for technical glitches, and rubrics shared upfront.
+          Candidates perform better when they know how they will be scored.
+        </p>
+        <p>
+          We recommend capping async stages at 25 minutes and always offering a live alternative for accessibility.
+        </p>
+      </article>
+      <article class="article-block" id="ch-feedback">
+        <h2>Closing the feedback loop</h2>
+        <p>
+          Rejection without rationale burns trust. A two-sentence, non-automated snippet — even templated — reduces negative reviews
+          and increases re-applications within 12 months.
+        </p>
+        <p>
+          HireHub nudges employers with gentle reminders when a role closes. Small nudge, outsized goodwill.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="cta-band" data-reveal>
+  <h2>Get the weekly brief</h2>
+  <p>One essay, one dataset, one UI pattern — every Tuesday. No recruitment spam, ever.</p>
+  <div class="cta-input-wrap">
+    <input type="email" placeholder="you@company.com" aria-label="Email for newsletter" />
+    <button type="button" id="cta-demo">Subscribe</button>
+  </div>
+  <p id="cta-toast" style="margin-top:16px;font-size:0.88rem;color:#059669;font-weight:600;min-height:1.2em;"></p>
+</div>
+
+<footer>
+  <div><a href="/">HireHub</a> · About &amp; blog</div>
+  <div><a href="/contact">Contact</a> · <a href="/privacy">Privacy</a></div>
+</footer>
+
+<script>
+(function () {
+  document.body.classList.add('ready');
+
+  var glow = document.getElementById('cursor-glow');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!reduceMotion && glow) {
+    document.addEventListener('mousemove', function (e) {
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    }, { passive: true });
+  } else if (glow) {
+    glow.style.display = 'none';
+  }
+
+  /* scroll progress */
+  var bar = document.getElementById('read-progress');
+  function onScroll() {
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop || document.body.scrollTop) / (h.scrollHeight - h.clientHeight);
+    var pct = Math.max(0, Math.min(100, scrolled * 100));
+    if (bar) {
+      bar.style.width = pct + '%';
+      bar.setAttribute('aria-valuenow', String(Math.round(pct)));
+    }
+
+    /* chapter nav active */
+    var links = document.querySelectorAll('#chapter-nav a');
+    var sections = [];
+    links.forEach(function (a) {
+      var id = a.getAttribute('href');
+      if (id && id.charAt(0) === '#') {
+        var el = document.querySelector(id);
+        if (el) sections.push({ a: a, el: el });
+      }
+    });
+    var mid = window.scrollY + window.innerHeight * 0.35;
+    sections.forEach(function (s, i) {
+      var top = s.el.offsetTop;
+      var next = sections[i + 1] ? sections[i + 1].el.offsetTop : Infinity;
+      if (mid >= top && mid < next) {
+        links.forEach(function (l) { l.classList.remove('active'); });
+        s.a.classList.add('active');
+      }
+    });
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* reveal on scroll (skip hero — handled below) */
+  var revealEls = [];
+  document.querySelectorAll('[data-reveal]').forEach(function (el) {
+    if (!el.closest('.hero')) revealEls.push(el);
+  });
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('reveal-in');
+          io.unobserve(en.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    revealEls.forEach(function (el) { io.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add('reveal-in'); });
+    document.querySelectorAll('.hero [data-reveal]').forEach(function (el) { el.classList.add('reveal-in'); });
+  }
+
+  /* 3D tilt cards */
+  if (!reduceMotion) {
+    document.querySelectorAll('[data-tilt]').forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        var r = card.getBoundingClientRect();
+        var x = e.clientX - r.left;
+        var y = e.clientY - r.top;
+        var px = (x / r.width - 0.5) * 2;
+        var py = (y / r.height - 0.5) * 2;
+        card.style.transform = 'perspective(900px) rotateY(' + (px * 6) + 'deg) rotateX(' + (-py * 6) + 'deg) translateZ(0)';
+      });
+      card.addEventListener('mouseleave', function () {
+        card.style.transform = '';
+      });
+    });
+  }
+
+  /* demo newsletter */
+  var btn = document.getElementById('cta-demo');
+  var toast = document.getElementById('cta-toast');
+  if (btn && toast) {
+    btn.addEventListener('click', function () {
+      toast.textContent = 'Thanks — this demo UI would connect to your mailing API.';
+    });
+  }
+
+  /* stagger hero */
+  if (!reduceMotion) {
+    setTimeout(function () {
+      document.querySelectorAll('.hero [data-reveal]').forEach(function (el, i) {
+        setTimeout(function () { el.classList.add('reveal-in'); }, 120 * i);
+      });
+    }, 200);
+  } else {
+    document.querySelectorAll('.hero [data-reveal]').forEach(function (el) { el.classList.add('reveal-in'); });
+  }
+})();
+</script>
+</body>
+</html>

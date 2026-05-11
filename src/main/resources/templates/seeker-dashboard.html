@@ -244,7 +244,9 @@
             ₹<span th:text="${job.salaryMin}"></span>–<span th:text="${job.salaryMax}"></span>
           </div>
         </div>
-        <a th:href="@{'/jobs/'+${job.id}+'/apply'}" class="btn-apply">Apply</a>
+        <form th:action="@{'/jobs/'+${job.id}+'/apply'}" method="post" style="margin:0">
+          <button type="submit" class="btn-apply">Apply</button>
+        </form>
       </div>
     </div>
 
